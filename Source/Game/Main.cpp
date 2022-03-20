@@ -10,8 +10,8 @@
 ===================================================================+*/
 
 #include "Common.h"
-
 #include "Game/Game.h"
+
 
 /*F+F+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   Function: wWinMain
@@ -36,34 +36,21 @@
 -----------------------------------------------------------------F-F*/
 INT WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ INT nCmdShow)
 {
-    /*--------------------------------------------------------------------
-      TODO: Unreferenced parameters (remove the comment)
-    --------------------------------------------------------------------*/
 
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 
-
-    /*--------------------------------------------------------------------
-      TODO: Initialization (remove the comment)
-    --------------------------------------------------------------------*/
-
-    if (FAILED(library::InitWindow(hInstance, nCmdShow))) {
+    if (FAILED(library::InitWindow(hInstance, nCmdShow)))
         return 0;
-    }
 
-    if (FAILED(library::InitDevice())) {
+    if (FAILED(library::InitDevice()))
+    {
         library::CleanupDevice();
         return 0;
     }
 
-
     // Main message loop
     MSG msg = { 0 };
-
-    /*--------------------------------------------------------------------
-      TODO: Main message loop (remove the comment)
-    --------------------------------------------------------------------*/
 
     while (WM_QUIT != msg.message)
     {
@@ -74,13 +61,9 @@ INT WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
         }
         else
         {
-            library::Render();  // Do some rendering
+            library::Render();
         }
     }
-
-    /*--------------------------------------------------------------------
-      TODO: Destroy (remove the comment)
-    --------------------------------------------------------------------*/
 
     library::CleanupDevice();
 
