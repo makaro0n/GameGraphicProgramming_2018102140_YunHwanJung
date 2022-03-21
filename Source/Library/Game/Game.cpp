@@ -31,17 +31,6 @@ namespace library
     Microsoft::WRL::ComPtr<IDXGIFactory1> dxgiFactory;
     Microsoft::WRL::ComPtr<IDXGIFactory2> dxgiFactory2;
 
-
-    /*--------------------------------------------------------------------
-      Forward declarations
-    --------------------------------------------------------------------*/
-
-    LRESULT CALLBACK WindowProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
-    HRESULT InitWindow(_In_ HINSTANCE hInstance, _In_ INT nCmdShow);
-    HRESULT InitDevice();
-    void CleanupDevice();
-    void Render();
-
     /*F+F+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       Function: WindowProc
 
@@ -63,14 +52,37 @@ namespace library
 
     LRESULT CALLBACK WindowProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam)
     {
+        PAINTSTRUCT ps;
+        HDC hdc;
+
         switch (uMsg)
         {
+        case WM_PAINT:
+            hdc = BeginPaint(hWnd, &ps);
+            EndPaint(hWnd, &ps);
+            break;
+
+        case WM_CLOSE:
+            if (MessageBox(hWnd,
+                L"Really quit?",
+                L"Game Graphics Programming",
+                MB_OKCANCEL) == IDOK)
+            {
+                DestroyWindow(hWnd);
+            }
+
+            return 0;
+
         case WM_DESTROY:
             PostQuitMessage(0);
             break;
+
+        default:
+            return DefWindowProc(hWnd, uMsg, wParam, lParam);
         }
 
-        return DefWindowProc(hWnd, uMsg, wParam, lParam);
+        return 0;
+
     }
 
 
