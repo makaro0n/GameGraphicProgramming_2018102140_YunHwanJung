@@ -65,19 +65,12 @@ namespace library
     {
         switch (uMsg)
         {
-        case WM_QUIT:
-        {
-            DestroyWindow(hWnd);
-            return 0;
-        }
-
         case WM_DESTROY:
             PostQuitMessage(0);
-            return 0;
-
-        default:
-            return DefWindowProc(hWnd, uMsg, wParam, lParam);
+            break;
         }
+
+        return DefWindowProc(hWnd, uMsg, wParam, lParam);
     }
 
 
