@@ -36,10 +36,10 @@ namespace library
       Forward declarations
     --------------------------------------------------------------------*/
 
-    HRESULT InitWindow(HINSTANCE hInstance, int nCmdShow);
+    LRESULT CALLBACK WindowProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
+    HRESULT InitWindow(_In_ HINSTANCE hInstance, _In_ INT nCmdShow);
     HRESULT InitDevice();
     void CleanupDevice();
-    LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
     void Render();
 
     /*F+F+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -60,7 +60,6 @@ namespace library
       Returns:  LRESULT
                   Integer value that your program returns to Windows
     -----------------------------------------------------------------F-F*/
-
 
     LRESULT CALLBACK WindowProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam)
     {
@@ -207,7 +206,6 @@ namespace library
         }
         if (FAILED(hr))
             return hr;
-
 
         // Obtain DXGI factory from device (since we used nullptr for pAdapter above)
         {
