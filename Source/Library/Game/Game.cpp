@@ -78,8 +78,6 @@ namespace library
         default:
             return DefWindowProc(hWnd, uMsg, wParam, lParam);
         }
-
-        return 0;        
     }
 
 
