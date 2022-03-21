@@ -62,6 +62,10 @@ namespace library
             EndPaint(hWnd, &ps);
             break;
 
+        case WM_DESTROY:
+            PostQuitMessage(0);
+            break;
+
         case WM_CLOSE:
             if (MessageBox(hWnd,
                 L"Really quit?",
@@ -73,18 +77,12 @@ namespace library
 
             return 0;
 
-        case WM_DESTROY:
-            PostQuitMessage(0);
-            break;
-
         default:
             return DefWindowProc(hWnd, uMsg, wParam, lParam);
         }
 
         return 0;
-
     }
-
 
     //--------------------------------------------------------------------------------------
     // Register class and create window
