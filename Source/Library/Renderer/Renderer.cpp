@@ -48,10 +48,11 @@ namespace library
 
         RECT rc;
         GetClientRect(hWnd, &rc);
-        UINT width = rc.right - rc.left;
-        UINT height = rc.bottom - rc.top;
+        UINT width = static_cast<UINT>(rc.right - rc.left);
+        UINT height = static_cast<UINT>(rc.bottom - rc.top);
 
         UINT createDeviceFlags = 0;
+
 #ifdef _DEBUG
         createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
