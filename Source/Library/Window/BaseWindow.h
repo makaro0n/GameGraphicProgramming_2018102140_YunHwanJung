@@ -57,10 +57,10 @@ namespace library
 
     protected:
         HRESULT initialize(
-            _In_ HINSTANCE hInstance,
-            _In_ INT nCmdShow,
-            _In_ PCWSTR pszWindowName,
-            _In_ DWORD dwStyle,
+            _In_     HINSTANCE hInstance,
+            _In_     INT nCmdShow,
+            _In_     PCWSTR pszWindowName,
+            _In_     DWORD dwStyle,
             _In_opt_ INT x = CW_USEDEFAULT,
             _In_opt_ INT y = CW_USEDEFAULT,
             _In_opt_ INT nWidth = CW_USEDEFAULT,
@@ -98,22 +98,23 @@ namespace library
     template <class DerivedType>
     LRESULT BaseWindow<DerivedType>::WindowProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam)
     {
-        DerivedType* pThis = nullptr;
+        DerivedType* pState = nullptr;
 
         if (uMsg == WM_NCCREATE)
         {
             CREATESTRUCT* pCreate = reinterpret_cast<CREATESTRUCT*>(lParam);
-            pThis = reinterpret_cast<DerivedType*>(pCreate->lpCreateParams);
-            SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pThis));
-            pThis->m_hWnd = hWnd;
+            pState = reinterpret_cast<DerivedType*>(pCreate->lpCreateParams);
+            SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pState));
+            pState->m_hWnd = hWnd;
         }
         else
         {
-            pThis = reinterpret_cast<DerivedType*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+            pState = reinterpret_cast<DerivedType*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
         }
-        if (pThis)
+
+        if (pState)
         {
-            return pThis->HandleMessage(uMsg, wParam, lParam);
+            return pState->HandleMessage(uMsg, wParam, lParam);
         }
 
         return DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -132,7 +133,7 @@ namespace library
     {
         m_hInstance = nullptr;
         m_hWnd = nullptr;
-        m_pszWindowName = L"TutorialWindowClass";
+        m_pszWindowName = nullptr;
     }
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
@@ -212,20 +213,21 @@ namespace library
         wcex.lpszMenuName = nullptr;
         wcex.lpszClassName = pszWindowName;
         wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_APPLICATION));
+
         if (!RegisterClassEx(&wcex))
             return E_FAIL;
 
-        DerivedType* pState = new(std::nothrow) DerivedType;
-        if (pState == nullptr)
-        {
-            return 0;
-        }
-
         // Create Window
         m_hInstance = hInstance;
+        m_pszWindowName = pszWindowName;
+
         RECT rc = { x, y, nWidth, nHeight };
         AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
-        m_hWnd = CreateWindowEx(0, pszWindowName, L"Game Graphics Programming Lab02: Object Oriented Design",
+
+        m_hWnd = CreateWindowEx(
+            0, 
+            GetWindowClassName(),
+            pszWindowName,
             WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
             x,
             y,
@@ -234,7 +236,9 @@ namespace library
             hWndParent,
             hMenu,
             hInstance,
-            pState);
+            this
+        );
+
         if (!m_hWnd)
             return E_FAIL;
 

@@ -21,7 +21,10 @@ namespace library
 
     HRESULT MainWindow::Initialize(_In_ HINSTANCE hInstance, _In_ INT nCmdShow, _In_ PCWSTR pszWindowName)
     {
-        HRESULT hr = initialize(hInstance, nCmdShow, pszWindowName,
+        HRESULT hr = initialize(
+            hInstance, 
+            nCmdShow, 
+            pszWindowName,
             CS_HREDRAW | CS_VREDRAW,
             0,
             0,

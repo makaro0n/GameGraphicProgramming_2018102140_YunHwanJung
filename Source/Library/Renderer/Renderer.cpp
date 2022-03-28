@@ -16,6 +16,7 @@ namespace library
     {
         m_driverType = D3D_DRIVER_TYPE_NULL;
         m_featureLevel = D3D_FEATURE_LEVEL_11_0;
+
         m_d3dDevice = nullptr;
         m_d3dDevice1 = nullptr;
         m_immediateContext = nullptr;
@@ -47,10 +48,13 @@ namespace library
 
         RECT rc;
         GetClientRect(hWnd, &rc);
-        UINT width = rc.right - static_cast<UINT>(rc.left);
-        UINT height = rc.bottom - static_cast<UINT>(rc.top);
+        UINT width = rc.right - rc.left;
+        UINT height = rc.bottom - rc.top;
 
         UINT createDeviceFlags = 0;
+#ifdef _DEBUG
+        createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
 
         D3D_DRIVER_TYPE driverTypes[] =
         {
@@ -112,6 +116,7 @@ namespace library
         hr = dxgiFactory.As(&dxgiFactory2);
         if (dxgiFactory2)
         {
+            // DirectX 11.1 or later
             hr = m_d3dDevice.As(&m_d3dDevice1);
             if (SUCCEEDED(hr))
             {
