@@ -133,7 +133,7 @@ namespace library
     {
         m_hInstance = nullptr;
         m_hWnd = nullptr;
-        m_pszWindowName = nullptr;
+        m_pszWindowName = L"TutorialWindowClass";
     }
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
@@ -211,7 +211,7 @@ namespace library
         wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
         wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
         wcex.lpszMenuName = nullptr;
-        wcex.lpszClassName = pszWindowName;
+        wcex.lpszClassName = GetWindowClassName();
         wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_APPLICATION));
 
         if (!RegisterClassEx(&wcex))
@@ -219,7 +219,6 @@ namespace library
 
         // Create Window
         m_hInstance = hInstance;
-        m_pszWindowName = pszWindowName;
 
         RECT rc = { x, y, nWidth, nHeight };
         AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
