@@ -32,8 +32,9 @@ namespace library
             600,
             nullptr,
             nullptr);
+
         if (FAILED(hr))
-            return 0;
+            return S_OK;
 
         return hr;
     }
@@ -77,6 +78,7 @@ namespace library
         {
         case WM_PAINT:
             hdc = BeginPaint(m_hWnd, &ps);
+            FillRect(hdc, &ps.rcPaint, (HBRUSH)(COLOR_WINDOW + 1));
             EndPaint(m_hWnd, &ps);
             break;
 

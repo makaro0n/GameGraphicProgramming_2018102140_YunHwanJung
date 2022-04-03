@@ -14,11 +14,10 @@ namespace library
 	M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
 	Game::Game(_In_ PCWSTR pszGameName)
-	{
-		m_pszGameName = pszGameName;
-		m_mainWindow = nullptr;
-		m_renderer = nullptr;
-	}
+		: m_pszGameName(pszGameName)
+		, m_mainWindow(nullptr)
+		, m_renderer(nullptr)
+	{ }
 
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
 	  Method:   Game::Initialize

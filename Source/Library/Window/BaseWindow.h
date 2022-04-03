@@ -116,8 +116,10 @@ namespace library
         {
             return pState->HandleMessage(uMsg, wParam, lParam);
         }
-
-        return DefWindowProc(hWnd, uMsg, wParam, lParam);
+        else
+        {
+            return DefWindowProc(hWnd, uMsg, wParam, lParam);
+        }
     }
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
@@ -129,12 +131,11 @@ namespace library
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
     template <class DerivedType>
-    BaseWindow<DerivedType>::BaseWindow()
-    {
-        m_hInstance = nullptr;
-        m_hWnd = nullptr;
-        m_pszWindowName = L"TutorialWindowClass";
-    }
+    BaseWindow<DerivedType>::BaseWindow() 
+        : m_hInstance(nullptr)
+        , m_hWnd(nullptr)
+        , m_pszWindowName(L"TutorialWindowClass")
+    { }
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
         Method:   BaseWindow<DerivedType>::GetWindow()
@@ -200,19 +201,22 @@ namespace library
         _In_opt_ HMENU hMenu)
     {
         // Register Class
-        WNDCLASSEX wcex;
-        wcex.cbSize = sizeof(WNDCLASSEX);
-        wcex.style = CS_HREDRAW | CS_VREDRAW;
-        wcex.lpfnWndProc = WindowProc;
-        wcex.cbClsExtra = 0;
-        wcex.cbWndExtra = 0;
-        wcex.hInstance = hInstance;
-        wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_APPLICATION));
-        wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-        wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-        wcex.lpszMenuName = nullptr;
-        wcex.lpszClassName = GetWindowClassName();
-        wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_APPLICATION));
+        WNDCLASSEX wcex =
+        {
+            .cbSize = sizeof(WNDCLASSEX),
+            .style = CS_HREDRAW | CS_VREDRAW,
+            .lpfnWndProc = WindowProc,
+            .cbClsExtra = 0,
+            .cbWndExtra = 0,
+            .hInstance = hInstance,
+            .hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_APPLICATION)),
+            .hCursor = LoadCursor(nullptr, IDC_ARROW),
+            .hbrBackground = (HBRUSH)(COLOR_WINDOW + 1),
+            .lpszMenuName = nullptr,
+            .lpszClassName = GetWindowClassName(),
+            .hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_APPLICATION))
+        };
+
 
         if (!RegisterClassEx(&wcex))
             return E_FAIL;
