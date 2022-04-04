@@ -262,7 +262,7 @@ namespace library
         }
 
         // Create vertex buffer
-        SimpleVertex vertices[] =
+        SimpleVertex aVertices[] =
         {
             XMFLOAT3{0.0f, 0.5f, 0.5f},
             XMFLOAT3{0.5f, -0.5f, 0.5f},
@@ -280,13 +280,12 @@ namespace library
 
         D3D11_SUBRESOURCE_DATA InitData = 
         { 
-            .pSysMem = vertices,
+            .pSysMem = aVertices,
             .SysMemPitch = 0,
             .SysMemSlicePitch = 0
         };
 
         hr = m_d3dDevice->CreateBuffer(&bd, &InitData, m_vertexBuffer.GetAddressOf());
-
         if (FAILED(hr))
         {
             return hr;
@@ -361,7 +360,6 @@ namespace library
 #endif
 
         ComPtr<ID3DBlob> pErrorBlob = nullptr;
-
         hr = D3DCompileFromFile(pszFileName, nullptr, nullptr, pszEntryPoint, szShaderModel, dwShaderFlags, 0, ppBlobOut, pErrorBlob.GetAddressOf());
 
         if (FAILED(hr))
