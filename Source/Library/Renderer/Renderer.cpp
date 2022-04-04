@@ -203,11 +203,10 @@ namespace library
 
         // Compile the vertex shader
         ComPtr<ID3DBlob> pVSBlob = nullptr;
-        hr = compileShaderFromFile(L"../../Source/Library/Shaders/Lab03.fxh", "VS", "vs_4_0", pVSBlob.GetAddressOf());
-
+        hr = compileShaderFromFile(L"../Library/Shaders/Lab03.fxh", "VS", "vs_5_0", pVSBlob.GetAddressOf());
         if (FAILED(hr))
         {
-            MessageBox(nullptr, L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK);
+            MessageBox(nullptr, L"Compile Vertex Shader Error", L"Error", MB_OK);
             return hr;
         }
 
@@ -221,8 +220,17 @@ namespace library
         // Define the input layout
         D3D11_INPUT_ELEMENT_DESC layout[] =
         {
-            { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+            {
+                "POSITION",
+                0,
+                DXGI_FORMAT_R32G32B32_FLOAT,
+                0,
+                0,
+                D3D11_INPUT_PER_VERTEX_DATA,
+                0 
+            }
         };
+
         UINT numElements = ARRAYSIZE(layout);
 
         // Create the input layout
@@ -238,11 +246,11 @@ namespace library
 
         // Compile the pixel shader
         ComPtr<ID3DBlob> pPSBlob = nullptr;
-        hr = compileShaderFromFile(L"../../Source/Library/Shaders/Lab03.fxh", "PS", "ps_4_0", pPSBlob.GetAddressOf());
+        hr = compileShaderFromFile(L"../Library/Shaders/Lab03.fxh", "PS", "ps_5_0", pPSBlob.GetAddressOf());
 
         if (FAILED(hr))
         {
-            MessageBox(nullptr, L"The FX file cannot be compiled.  Please run this executable from the directory that contains the FX file.", L"Error", MB_OK);
+            MessageBox(nullptr, L"Compile Pixel Shader Error", L"Error", MB_OK);
             return hr;
         }
 
