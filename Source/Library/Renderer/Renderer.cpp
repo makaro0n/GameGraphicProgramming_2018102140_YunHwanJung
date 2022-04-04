@@ -218,7 +218,7 @@ namespace library
         }
 
         // Define the input layout
-        D3D11_INPUT_ELEMENT_DESC layout[] =
+        D3D11_INPUT_ELEMENT_DESC aLayouts[] =
         {
             {
                 "POSITION",
@@ -231,17 +231,16 @@ namespace library
             }
         };
 
-        UINT numElements = ARRAYSIZE(layout);
+        UINT uNumElements = ARRAYSIZE(aLayouts);
 
         // Create the input layout
-        hr = m_d3dDevice->CreateInputLayout(layout, numElements, pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), m_vertexLayout.GetAddressOf());
+        hr = m_d3dDevice->CreateInputLayout(aLayouts, uNumElements, pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), m_vertexLayout.GetAddressOf());
 
         if (FAILED(hr))
         {
             return hr;
         }
 
-        // Set the input layout
         m_immediateContext->IASetInputLayout(m_vertexLayout.Get());
 
         // Compile the pixel shader
@@ -275,10 +274,17 @@ namespace library
             .ByteWidth = sizeof(SimpleVertex) * 3,
             .Usage = D3D11_USAGE_DEFAULT,
             .BindFlags = D3D11_BIND_VERTEX_BUFFER,
-            .CPUAccessFlags = 0
+            .CPUAccessFlags = 0,
+            .MiscFlags = 0
         };
 
-        D3D11_SUBRESOURCE_DATA InitData = { .pSysMem = vertices };
+        D3D11_SUBRESOURCE_DATA InitData = 
+        { 
+            .pSysMem = vertices,
+            .SysMemPitch = 0,
+            .SysMemSlicePitch = 0
+        };
+
         hr = m_d3dDevice->CreateBuffer(&bd, &InitData, m_vertexBuffer.GetAddressOf());
 
         if (FAILED(hr))
