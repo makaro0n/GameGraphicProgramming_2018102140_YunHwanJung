@@ -15,8 +15,8 @@ namespace library
 
 	Game::Game(_In_ PCWSTR pszGameName)
 		: m_pszGameName(pszGameName)
-		, m_mainWindow(nullptr)
-		, m_renderer(nullptr)
+		, m_mainWindow(std::make_unique<library::MainWindow>())
+		, m_renderer(std::make_unique<library::Renderer>())
 	{ }
 
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
@@ -40,15 +40,11 @@ namespace library
 	{
 		HRESULT hr;
 
-		m_mainWindow = std::make_unique<MainWindow>();
 		hr = m_mainWindow->Initialize(hInstance, nCmdShow, m_pszGameName);
-
 		if (FAILED(hr)) 
 			return hr;
 
-		m_renderer = std::make_unique<Renderer>();
 		hr = m_renderer->Initialize(m_mainWindow->GetWindow());
-
 		if (FAILED(hr)) 
 			return hr;
 
@@ -67,6 +63,14 @@ namespace library
 
 	INT Game::Run()
 	{
+		LARGE_INTEGER startTime, endTime;
+		LARGE_INTEGER frequency;
+		FLOAT elapsedTime;
+
+		QueryPerformanceFrequency(&frequency);
+		QueryPerformanceCounter(&startTime);
+
+		// Main message loop
 		MSG msg = { 0 };
 
 		while (WM_QUIT != msg.message)
@@ -78,6 +82,10 @@ namespace library
 			}
 			else
 			{
+				QueryPerformanceCounter(&endTime);
+				elapsedTime = static_cast<FLOAT>(endTime.QuadPart - startTime.QuadPart);
+				elapsedTime /= static_cast<FLOAT>(frequency.QuadPart);
+				m_renderer->Update(elapsedTime);
 				m_renderer->Render();
 			}
 		}
@@ -97,5 +105,30 @@ namespace library
 	PCWSTR Game::GetGameName() const
 	{
 		return m_pszGameName;
+	}
+
+	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+	  Method:   Game::GetWindow
+	  Summary:  Returns the main window
+	  Returns:  std::unique_ptr<MainWindow>&
+				  The main window
+	M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+
+	std::unique_ptr<MainWindow>& Game::GetWindow()
+	{
+		return m_mainWindow;
+	}
+
+
+	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+	  Method:   Game::GetRenderer
+	  Summary:  Returns the renderer
+	  Returns:  std::unique_ptr<Renderer>&
+				  The renderer
+	M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+
+	std::unique_ptr<Renderer>& Game::GetRenderer()
+	{
+		return m_renderer;
 	}
 }

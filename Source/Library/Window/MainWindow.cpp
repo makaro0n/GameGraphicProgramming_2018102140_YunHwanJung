@@ -21,6 +21,9 @@ namespace library
 
     HRESULT MainWindow::Initialize(_In_ HINSTANCE hInstance, _In_ INT nCmdShow, _In_ PCWSTR pszWindowName)
     {
+        RECT rc = { 0, 0, 800, 600 };
+        AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
+
         HRESULT hr = initialize(
             hInstance, 
             nCmdShow, 
@@ -34,8 +37,7 @@ namespace library
             nullptr);
 
         if (FAILED(hr))
-            return S_OK;
-
+            return hr;
         return hr;
     }
 

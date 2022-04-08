@@ -223,10 +223,7 @@ namespace library
 
         // Create Window
         m_hInstance = hInstance;
-
-        RECT rc = { x, y, nWidth, nHeight };
-        AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
-
+        
         m_hWnd = CreateWindowEx(
             0, 
             GetWindowClassName(),
@@ -241,7 +238,6 @@ namespace library
             hInstance,
             this
         );
-
         if (!m_hWnd)
             return E_FAIL;
 
