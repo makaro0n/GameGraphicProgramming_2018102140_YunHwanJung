@@ -255,10 +255,10 @@ namespace library
         m_projection = XMMatrixPerspectiveFovLH(XM_PIDIV2, width / (FLOAT)height, 0.01f, 100.0f);
 
         // Initialize the view matrix
-        XMVECTOR Eye = XMVectorSet(0.0f, 1.0f, -5.0f, 0.0f);
-        XMVECTOR At = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-        XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-        m_view = XMMatrixLookAtLH(Eye, At, Up);
+        XMVECTOR eye = XMVectorSet(0.0f, 1.0f, -5.0f, 0.0f);
+        XMVECTOR at = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+        XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+        m_view = XMMatrixLookAtLH(eye, at, up);
 
         // Initialize the shaders 
         for (auto pixelShadersElem : m_pixelShaders)
@@ -303,7 +303,7 @@ namespace library
         }
         else
         {
-            m_renderables[pszRenderableName] = renderable;
+            m_renderables.insert(std::make_pair(pszRenderableName, renderable));
             return S_OK;
         }
     }
@@ -332,7 +332,7 @@ namespace library
         }
         else
         {
-            m_vertexShaders[pszVertexShaderName] = vertexShader;
+            m_vertexShaders.insert(std::make_pair(pszVertexShaderName, vertexShader));
             return S_OK;
         }
     }
@@ -361,7 +361,7 @@ namespace library
         }
         else
         {
-            m_pixelShaders[pszPixelShaderName] = pixelShader;
+            m_pixelShaders.insert(std::make_pair(pszPixelShaderName, pixelShader));
             return S_OK;
         }
     }
@@ -383,7 +383,6 @@ namespace library
         }
     }
 
-
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
       Method:   Renderer::Render
 
@@ -393,23 +392,39 @@ namespace library
     void Renderer::Render()
     {
         // Clear the backbuffer
-        m_immediateContext->ClearRenderTargetView(m_renderTargetView.Get(), Colors::MidnightBlue);
+        m_immediateContext->ClearRenderTargetView(
+            m_renderTargetView.Get(), 
+            Colors::MidnightBlue
+        );
 
         // Clear the depth buffer to 1.0 (max depth)
-        m_immediateContext->ClearDepthStencilView(m_depthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+        m_immediateContext->ClearDepthStencilView(
+            m_depthStencilView.Get(), 
+            D3D11_CLEAR_DEPTH, 
+            1.0f,
+            0
+        );
 
         for (auto renderablesElem : m_renderables)
         {
             // Set the vertex buffer
             UINT stride = sizeof(SimpleVertex);
             UINT offset = 0;
-            m_immediateContext->IASetVertexBuffers(0, 1, renderablesElem.second->GetVertexBuffer().GetAddressOf(), &stride, &offset);
+
+            m_immediateContext->IASetVertexBuffers(
+                0,
+                1,
+                renderablesElem.second->GetVertexBuffer().GetAddressOf(),
+                &stride,
+                &offset
+            );
 
             // Set the index buffer 
-            m_immediateContext->IASetIndexBuffer(renderablesElem.second->GetIndexBuffer().Get(), DXGI_FORMAT_R16_UINT, 0);
-
-            // Set primitive topology
-            m_immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+            m_immediateContext->IASetIndexBuffer(
+                renderablesElem.second->GetIndexBuffer().Get(),
+                DXGI_FORMAT_R16_UINT,
+                0
+            );
 
             // Set the input layout
             m_immediateContext->IASetInputLayout(renderablesElem.second->GetVertexLayout().Get());
@@ -419,13 +434,42 @@ namespace library
             cb.World = XMMatrixTranspose(renderablesElem.second->GetWorldMatrix());
             cb.View = XMMatrixTranspose(m_view);
             cb.Projection = XMMatrixTranspose(m_projection);
-            m_immediateContext->UpdateSubresource(renderablesElem.second->GetConstantBuffer().Get(), 0, nullptr, &cb, 0, 0);
+            m_immediateContext->UpdateSubresource(
+                renderablesElem.second->GetConstantBuffer().Get(),
+                0,
+                nullptr,
+                &cb,
+                0,
+                0
+            );
+
+            // Set primitive topology
+            m_immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
             // Render the triangles 
-            m_immediateContext->VSSetShader(renderablesElem.second->GetVertexShader().Get(), nullptr, 0);
-            m_immediateContext->VSSetConstantBuffers(0, 1, renderablesElem.second->GetConstantBuffer().GetAddressOf());
-            m_immediateContext->PSSetShader(renderablesElem.second->GetPixelShader().Get(), nullptr, 0);
-            m_immediateContext->DrawIndexed(renderablesElem.second->GetNumIndices(), 0, 0);
+            m_immediateContext->VSSetShader(
+                renderablesElem.second->GetVertexShader().Get(),
+                nullptr,
+                0
+            );
+
+            m_immediateContext->VSSetConstantBuffers(
+                0,
+                1,
+                renderablesElem.second->GetConstantBuffer().GetAddressOf()
+            );
+
+            m_immediateContext->PSSetShader(
+                renderablesElem.second->GetPixelShader().Get(),
+                nullptr,
+                0
+            );
+
+            m_immediateContext->DrawIndexed(
+                renderablesElem.second->GetNumIndices(),
+                0,
+                0
+            );
         }
 
         // Present the information rendered to the back buffer to the front buffer (the screen)
@@ -450,12 +494,19 @@ namespace library
 
     HRESULT Renderer::SetVertexShaderOfRenderable(_In_ PCWSTR pszRenderableName, _In_ PCWSTR pszVertexShaderName)
     {
-        if (AddVertexShader(pszRenderableName, m_vertexShaders[pszVertexShaderName]) == E_FAIL)
+        if (m_renderables.find(pszRenderableName) == m_renderables.end())
+        {
             return E_FAIL;
-
-        m_renderables[pszRenderableName]->SetVertexShader(m_vertexShaders[pszVertexShaderName]);
-
-        return S_OK;
+        }
+        else
+        {
+            if (m_vertexShaders.find(pszVertexShaderName) != m_vertexShaders.end())
+            {
+                m_renderables.find(pszRenderableName)->second->SetVertexShader(m_vertexShaders.find(pszVertexShaderName)->second);
+                return S_OK;
+            }
+            return E_FAIL;
+        }
     }
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
@@ -469,19 +520,26 @@ namespace library
                   Key of the pixel shader
 
       Modifies: [m_renderables].
-      Returns:  HRESULT
 
+      Returns:  HRESULT
                   Status code
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
     HRESULT Renderer::SetPixelShaderOfRenderable(_In_ PCWSTR pszRenderableName, _In_ PCWSTR pszPixelShaderName)
     {
-        if (AddPixelShader(pszRenderableName, m_pixelShaders[pszPixelShaderName]) == E_FAIL)
+        if (m_renderables.find(pszRenderableName) == m_renderables.end())
+        {
             return E_FAIL;
-
-        m_renderables[pszRenderableName]->SetPixelShader(m_pixelShaders[pszPixelShaderName]);
-
-        return S_OK;
+        }
+        else
+        {
+            if (m_pixelShaders.find(pszPixelShaderName) != m_pixelShaders.end())
+            {
+                m_renderables.find(pszRenderableName)->second->SetPixelShader(m_pixelShaders.find(pszPixelShaderName)->second);
+                return S_OK;
+            }
+            return E_FAIL;
+        }
     }
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M

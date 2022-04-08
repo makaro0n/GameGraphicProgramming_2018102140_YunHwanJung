@@ -38,7 +38,7 @@ namespace library
 
 	HRESULT Game::Initialize(_In_ HINSTANCE hInstance, _In_ INT nCmdShow)
 	{
-		HRESULT hr;
+		HRESULT hr = S_OK;
 
 		hr = m_mainWindow->Initialize(hInstance, nCmdShow, m_pszGameName);
 		if (FAILED(hr)) 
@@ -50,7 +50,6 @@ namespace library
 
 		return S_OK;
 	}
-
 
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
 	  Method:   Game::Run
@@ -109,7 +108,9 @@ namespace library
 
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
 	  Method:   Game::GetWindow
+
 	  Summary:  Returns the main window
+
 	  Returns:  std::unique_ptr<MainWindow>&
 				  The main window
 	M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
@@ -122,7 +123,9 @@ namespace library
 
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
 	  Method:   Game::GetRenderer
+
 	  Summary:  Returns the renderer
+
 	  Returns:  std::unique_ptr<Renderer>&
 				  The renderer
 	M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
