@@ -17,27 +17,27 @@
 
 
 /*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
-      Class:    OrbitCube
+      Class:    CustomCube
 
-      Summary:  OrbitCube class
+      Summary:  CustomCube class
 
       Methods:  Update
                   Update the cube each frame
-                OrbitCube
+                CustomCube
                   Constructor.
-                ~OrbitCube
+                ~CustomCube
                   Destructor.
 C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
 
-class OrbitCube : public BaseCube
+class CustomCube : public BaseCube
 {
 public:
-    OrbitCube() = default;
-    OrbitCube(const OrbitCube& other) = delete;
-    OrbitCube(OrbitCube&& other) = delete;
-    OrbitCube& operator=(const OrbitCube& other) = delete;
-    OrbitCube& operator=(OrbitCube&& other) = delete;
-    ~OrbitCube() = default;
+    CustomCube() = default;
+    CustomCube(const CustomCube& other) = delete;
+    CustomCube(CustomCube&& other) = delete;
+    CustomCube& operator=(const CustomCube& other) = delete;
+    CustomCube& operator=(CustomCube&& other) = delete;
+    ~CustomCube() = default;
 
     virtual void Update(_In_ FLOAT deltaTime) override;
 

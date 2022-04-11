@@ -9,8 +9,10 @@
               Time difference of a frame
 M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-void YourCube::Update(_In_ FLOAT deltaTime)
+void YourCube::Update(
+    _In_ FLOAT deltaTime
+)
 {
-    m_world = XMMatrixRotationY(deltaTime);
+    Renderable::RotateY(deltaTime);
 }
 

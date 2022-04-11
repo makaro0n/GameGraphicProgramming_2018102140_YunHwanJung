@@ -14,7 +14,10 @@
               Status code
 M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-HRESULT BaseCube::Initialize(_In_ ID3D11Device* pDevice, _In_ ID3D11DeviceContext* pImmediateContext)
+HRESULT BaseCube::Initialize(
+    _In_ ID3D11Device* pDevice, 
+    _In_ ID3D11DeviceContext* pImmediateContext
+)
 {
     HRESULT hr = S_OK;
     hr = initialize(pDevice, pImmediateContext);
