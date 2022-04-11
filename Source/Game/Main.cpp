@@ -16,6 +16,7 @@
 #include "Game/Game.h"
 #include "Cube/YourCube.h"
 #include "Cube/OrbitCube.h"
+#include "Cube/CustomCube.h"
 
 /*F+F+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   Function: wWinMain
@@ -38,7 +39,12 @@
   Returns:  INT
               Status code.
 -----------------------------------------------------------------F-F*/
-INT WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ INT nCmdShow)
+INT WINAPI wWinMain(
+    _In_ HINSTANCE hInstance, 
+    _In_opt_ HINSTANCE hPrevInstance,
+    _In_ LPWSTR lpCmdLine, 
+    _In_ INT nCmdShow
+)
 {
 
 #ifdef _DEBUG
@@ -91,6 +97,22 @@ INT WINAPI wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
         return 0;
     }
     if (FAILED(game->GetRenderer()->SetPixelShaderOfRenderable(L"OrbitCube", L"MainShader")))
+    {
+        return 0;
+    }
+
+    // Custom Cube
+    std::shared_ptr<CustomCube> customCube = std::make_shared<CustomCube>();
+    if (FAILED(game->GetRenderer()->AddRenderable(L"CustomCube", customCube)))
+    {
+        return 0;
+    }
+
+    if (FAILED(game->GetRenderer()->SetVertexShaderOfRenderable(L"CustomCube", L"MainShader")))
+    {
+        return 0;
+    }
+    if (FAILED(game->GetRenderer()->SetPixelShaderOfRenderable(L"CustomCube", L"MainShader")))
     {
         return 0;
     }

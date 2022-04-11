@@ -92,6 +92,12 @@ namespace library
 
 				startTime = endTime;
 
+				m_renderer->HandleInput(
+					m_mainWindow->GetDirections(), 
+					m_mainWindow->GetMouseRelativeMovement(),
+					elapsedTime);
+				m_mainWindow->ResetMouseMovement();
+
 				m_renderer->Update(elapsedTime);
 				m_renderer->Render();
 			}

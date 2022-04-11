@@ -19,7 +19,11 @@ namespace library
       Modifies: [m_pszFileName, m_pszEntryPoint, m_pszShaderModel].
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-    Shader::Shader(_In_ PCWSTR pszFileName, _In_ PCSTR pszEntryPoint, _In_ PCSTR pszShaderModel)
+    Shader::Shader(
+        _In_ PCWSTR pszFileName,
+        _In_ PCSTR pszEntryPoint,
+        _In_ PCSTR pszShaderModel
+    )
         : m_pszFileName(pszFileName)
         , m_pszEntryPoint(pszEntryPoint)
         , m_pszShaderModel(pszShaderModel)
@@ -53,7 +57,9 @@ namespace library
                   Status code
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-    HRESULT Shader::compile(_Outptr_ ID3DBlob** ppOutBlob)
+    HRESULT Shader::compile(
+        _Outptr_ ID3DBlob** ppOutBlob
+    )
     {
         HRESULT hr = S_OK;
 

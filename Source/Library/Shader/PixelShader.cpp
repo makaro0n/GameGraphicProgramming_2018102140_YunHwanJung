@@ -19,7 +19,11 @@ namespace library
       Modifies: [m_pixelShader].
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-    PixelShader::PixelShader(_In_ PCWSTR pszFileName, _In_ PCSTR pszEntryPoint, _In_ PCSTR pszShaderModel)
+    PixelShader::PixelShader(
+        _In_ PCWSTR pszFileName,
+        _In_ PCSTR pszEntryPoint,
+        _In_ PCSTR pszShaderModel
+    )
         : Shader(pszFileName, pszEntryPoint, pszShaderModel)
         , m_pixelShader(nullptr)
     {
@@ -37,7 +41,9 @@ namespace library
                   Status code
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-    HRESULT PixelShader::Initialize(_In_ ID3D11Device* pDevice)
+    HRESULT PixelShader::Initialize(
+        _In_ ID3D11Device* pDevice
+    )
     {
         HRESULT hr = S_OK;
         // Compile the pixel shader
@@ -72,5 +78,4 @@ namespace library
     {
         return m_pixelShader;
     }
-
 }

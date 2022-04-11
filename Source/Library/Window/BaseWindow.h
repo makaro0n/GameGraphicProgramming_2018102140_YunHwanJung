@@ -96,7 +96,12 @@ namespace library
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
     template <class DerivedType>
-    LRESULT BaseWindow<DerivedType>::WindowProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam)
+    LRESULT BaseWindow<DerivedType>::WindowProc(
+        _In_ HWND hWnd, 
+        _In_ UINT uMsg,
+        _In_ WPARAM wParam,
+        _In_ LPARAM lParam
+    )
     {
         DerivedType* pState = nullptr;
 
@@ -198,7 +203,8 @@ namespace library
         _In_opt_ INT nWidth,
         _In_opt_ INT nHeight,
         _In_opt_ HWND hWndParent,
-        _In_opt_ HMENU hMenu)
+        _In_opt_ HMENU hMenu
+    )
     {
         // Register Class
         WNDCLASSEX wcex =
@@ -216,7 +222,6 @@ namespace library
             .lpszClassName = GetWindowClassName(),
             .hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_APPLICATION))
         };
-
 
         if (!RegisterClassEx(&wcex))
             return E_FAIL;
@@ -238,6 +243,7 @@ namespace library
             hInstance,
             this
         );
+
         if (!m_hWnd)
             return E_FAIL;
 

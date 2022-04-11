@@ -19,7 +19,10 @@ namespace library
                   Status code
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-    HRESULT Renderable::initialize(_In_ ID3D11Device* pDevice, _In_ ID3D11DeviceContext*)
+    HRESULT Renderable::initialize(
+        _In_ ID3D11Device* pDevice,
+        _In_ ID3D11DeviceContext* pImmediateContext
+    )
     {
         HRESULT hr = S_OK;
 
@@ -81,7 +84,9 @@ namespace library
       Modifies: [m_vertexShader].
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-    void Renderable::SetVertexShader(_In_ const std::shared_ptr<VertexShader>& vertexShader)
+    void Renderable::SetVertexShader(
+        _In_ const std::shared_ptr<VertexShader>& vertexShader
+    )
     {
         m_vertexShader = vertexShader;
     }
@@ -98,7 +103,9 @@ namespace library
       Modifies: [m_pixelShader].
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-    void Renderable::SetPixelShader(_In_ const std::shared_ptr<PixelShader>& pixelShader)
+    void Renderable::SetPixelShader(
+        _In_ const std::shared_ptr<PixelShader>& pixelShader
+    )
     {
         m_pixelShader = pixelShader;
     }
@@ -212,7 +219,9 @@ namespace library
       Modifies: [m_world].
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-    void Renderable::RotateX(_In_ FLOAT angle)
+    void Renderable::RotateX(
+        _In_ FLOAT angle
+    )
     {
         // m_world *= x-axis rotation by angle matrix
         m_world *= XMMatrixRotationX(angle);
@@ -220,16 +229,15 @@ namespace library
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
       Method:   Renderable::RotateY
-
       Summary:  Rotates around the y-axis
-
       Args:     FLOAT angle
                   Angle of rotation around the y-axis, in radians
-
       Modifies: [m_world].
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-    void Renderable::RotateY(_In_ FLOAT angle)
+    void Renderable::RotateY(
+        _In_ FLOAT angle
+    )
     {
         // m_world *= y-axis rotation by angle matrix
         m_world *= XMMatrixRotationY(angle);
@@ -237,16 +245,15 @@ namespace library
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
       Method:   Renderable::RotateZ
-
       Summary:  Rotates around the z-axis
-
       Args:     FLOAT angle
                   Angle of rotation around the z-axis, in radians
-
       Modifies: [m_world].
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-    void Renderable::RotateZ(_In_ FLOAT angle)
+    void Renderable::RotateZ(
+        _In_ FLOAT angle
+    )
     {
         // m_world *= z-axis rotation by angle matrix
         m_world *= XMMatrixRotationZ(angle);
@@ -254,20 +261,19 @@ namespace library
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
       Method:   Renderable::RotateRollPitchYaw
-
       Summary:  Rotates based on a given pitch, yaw, and roll (Euler angles)
-
       Args:     FLOAT pitch
                   Angle of rotation around the x-axis, in radians
                 FLOAT yaw
                   Angle of rotation around the y-axis, in radians
                 FLOAT roll
                   Angle of rotation around the z-axis, in radians
-
       Modifies: [m_world].
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-    void Renderable::RotateRollPitchYaw(_In_ FLOAT pitch, _In_ FLOAT yaw, _In_ FLOAT roll)
+    void Renderable::RotateRollPitchYaw(
+        _In_ FLOAT pitch, _In_ FLOAT yaw, _In_ FLOAT roll
+    )
     {
         // m_world *= x, y, z-axis rotation by pitch, yaw, roll matrix
         m_world *= XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
@@ -275,19 +281,18 @@ namespace library
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
       Method:   Renderable::Scale
-
       Summary:  Scales along the x-axis, y-axis, and z-axis
-
       Args:     FLOAT scaleX
                   Scaling factor along the x-axis.
                 FLOAT scaleY
                   Scaling factor along the y-axis.
                 FLOAT scaleZ
                   Scaling factor along the z-axis.
-
       Modifies: [m_world].
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-    void Renderable::Scale(_In_ FLOAT scaleX, _In_ FLOAT scaleY, _In_ FLOAT scaleZ)
+    void Renderable::Scale(
+        _In_ FLOAT scaleX, _In_ FLOAT scaleY, _In_ FLOAT scaleZ
+    )
     {
         // m_world *= x, y, z-axis scaling by scale factor matrix
         m_world *= XMMatrixScaling(scaleX, scaleY, scaleZ);
@@ -295,16 +300,15 @@ namespace library
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
       Method:   Renderable::Translate
-
       Summary:  Translates matrix from a vector
-
       Args:     const XMVECTOR& offset
                   3D vector describing the translations along the x-axis, y-axis, and z-axis
-
       Modifies: [m_world].
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-    void Renderable::Translate(_In_ const XMVECTOR& offset)
+    void Renderable::Translate(
+        _In_ const XMVECTOR& offset
+    )
     {
         // m_world *= translate by offset vector matrix
         m_world *= XMMatrixTranslationFromVector(offset);

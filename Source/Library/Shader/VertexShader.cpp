@@ -19,7 +19,11 @@ namespace library
       Modifies: [m_vertexShader].
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-    VertexShader::VertexShader(_In_ PCWSTR pszFileName, _In_ PCSTR pszEntryPoint, _In_ PCSTR pszShaderModel)
+    VertexShader::VertexShader(
+        _In_ PCWSTR pszFileName,
+        _In_ PCSTR pszEntryPoint,
+        _In_ PCSTR pszShaderModel
+    )
         : Shader(pszFileName, pszEntryPoint, pszShaderModel)
         , m_vertexShader(nullptr)
     {
@@ -37,7 +41,9 @@ namespace library
                   Status code
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-    HRESULT VertexShader::Initialize(_In_ ID3D11Device* pDevice)
+    HRESULT VertexShader::Initialize(
+        _In_ ID3D11Device* pDevice
+    )
     {
         HRESULT hr = S_OK;
         // Compile the vertex shader

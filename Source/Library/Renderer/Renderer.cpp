@@ -28,7 +28,7 @@ namespace library
         , m_depthStencil(nullptr)
         , m_depthStencilView(nullptr)
 
-        , m_view()
+        , m_camera(XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f))
         , m_projection()
 
         , m_renderables(std::unordered_map<PCWSTR, std::shared_ptr<Renderable>>())
@@ -54,7 +54,9 @@ namespace library
                   Status code
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-    HRESULT Renderer::Initialize(_In_ HWND hWnd)
+    HRESULT Renderer::Initialize(
+        _In_ HWND hWnd
+    )
     {
         HRESULT hr = S_OK;
 
@@ -165,18 +167,19 @@ namespace library
                 {
                     .Width = width,
                     .Height = height,
-                    .RefreshRate = { .Numerator = 60, .Denominator = 1 },
+                    .RefreshRate = {.Numerator = 60, .Denominator = 1 },
                     .Format = DXGI_FORMAT_R8G8B8A8_UNORM,
                 },
-                .SampleDesc = 
-                { 
-                    .Count = 1, 
-                    . Quality = 0 
+                .SampleDesc =
+                {
+                    .Count = 1,
+                    .Quality = 0
                 },
                 .BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT,
                 .BufferCount = 1,
                 .OutputWindow = hWnd,
-                .Windowed = TRUE
+                .Windowed = false,
+                .SwapEffect = DXGI_SWAP_EFFECT_DISCARD
             };
 
             hr = dxgiFactory->CreateSwapChain(m_d3dDevice.Get(), &sd, m_swapChain.GetAddressOf());
@@ -252,13 +255,19 @@ namespace library
         m_immediateContext->RSSetViewports(1, &vp);
 
         // Initialize the projection matrix
-        m_projection = XMMatrixPerspectiveFovLH(XM_PIDIV2, width / (FLOAT)height, 0.01f, 100.0f);
+        m_projection = XMMatrixPerspectiveFovLH(
+            XM_PIDIV2, 
+            width / (FLOAT)height,
+            0.01f, 
+            100.0f
+        );
 
         // Initialize the view matrix
         XMVECTOR eye = XMVectorSet(0.0f, 1.0f, -5.0f, 0.0f);
         XMVECTOR at = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
         XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-        m_view = XMMatrixLookAtLH(eye, at, up);
+        // m_view = view
+        XMMATRIX view = XMMatrixLookAtLH(eye, at, up);
 
         // Initialize the shaders 
         for (auto pixelShadersElem : m_pixelShaders)
@@ -295,7 +304,10 @@ namespace library
                   Status code.
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-    HRESULT Renderer::AddRenderable(_In_ PCWSTR pszRenderableName, _In_ const std::shared_ptr<Renderable>& renderable)
+    HRESULT Renderer::AddRenderable(
+        _In_ PCWSTR pszRenderableName,
+        _In_ const std::shared_ptr<Renderable>& renderable
+    )
     {
         if (m_renderables.find(pszRenderableName) != m_renderables.end())
         {
@@ -324,7 +336,10 @@ namespace library
                   Status code
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-    HRESULT Renderer::AddVertexShader(_In_ PCWSTR pszVertexShaderName, _In_ const std::shared_ptr<VertexShader>& vertexShader)
+    HRESULT Renderer::AddVertexShader(
+        _In_ PCWSTR pszVertexShaderName, 
+        _In_ const std::shared_ptr<VertexShader>& vertexShader
+    )
     {
         if (m_vertexShaders.find(pszVertexShaderName) != m_vertexShaders.end())
         {
@@ -353,7 +368,10 @@ namespace library
                   Status code
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-    HRESULT Renderer::AddPixelShader(_In_ PCWSTR pszPixelShaderName, _In_ const std::shared_ptr<PixelShader>& pixelShader)
+    HRESULT Renderer::AddPixelShader(
+        _In_ PCWSTR pszPixelShaderName, 
+        _In_ const std::shared_ptr<PixelShader>& pixelShader
+    )
     {
         if (m_pixelShaders.find(pszPixelShaderName) != m_pixelShaders.end())
         {
@@ -366,6 +384,33 @@ namespace library
         }
     }
 
+
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Renderer::HandleInput
+
+      Summary:  Add the pixel shader into the renderer and initialize it
+
+      Args:     const DirectionsInput& directions
+                  Data structure containing keyboard input data
+                const MouseRelativeMovement& mouseRelativeMovement
+                  Data structure containing mouse relative input data
+
+      Modifies: [m_camera].
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+
+    void Renderer::HandleInput(
+        _In_ const DirectionsInput& directions,
+        _In_ const MouseRelativeMovement& mouseRelativeMovement,
+        _In_ FLOAT deltaTime
+    )
+    {
+        m_camera.HandleInput(
+            directions,
+            mouseRelativeMovement,
+            deltaTime
+        );
+    }
+
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
       Method:   Renderer::Update
 
@@ -375,7 +420,9 @@ namespace library
                   Time difference of a frame
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-    void Renderer::Update(_In_ FLOAT deltaTime)
+    void Renderer::Update(
+        _In_ FLOAT deltaTime
+    )
     {
         for (auto renderablesElem : m_renderables)
         {
@@ -432,8 +479,9 @@ namespace library
             // Update constant buffer
             ConstantBuffer cb;
             cb.World = XMMatrixTranspose(renderablesElem.second->GetWorldMatrix());
-            cb.View = XMMatrixTranspose(m_view);
+            cb.View = XMMatrixTranspose(m_camera.GetView());
             cb.Projection = XMMatrixTranspose(m_projection);
+
             m_immediateContext->UpdateSubresource(
                 renderablesElem.second->GetConstantBuffer().Get(),
                 0,
@@ -492,7 +540,10 @@ namespace library
                   Status code
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-    HRESULT Renderer::SetVertexShaderOfRenderable(_In_ PCWSTR pszRenderableName, _In_ PCWSTR pszVertexShaderName)
+    HRESULT Renderer::SetVertexShaderOfRenderable(
+        _In_ PCWSTR pszRenderableName,
+        _In_ PCWSTR pszVertexShaderName
+    )
     {
         if (m_renderables.find(pszRenderableName) == m_renderables.end())
         {
@@ -525,7 +576,10 @@ namespace library
                   Status code
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-    HRESULT Renderer::SetPixelShaderOfRenderable(_In_ PCWSTR pszRenderableName, _In_ PCWSTR pszPixelShaderName)
+    HRESULT Renderer::SetPixelShaderOfRenderable(
+        _In_ PCWSTR pszRenderableName,
+        _In_ PCWSTR pszPixelShaderName
+    )
     {
         if (m_renderables.find(pszRenderableName) == m_renderables.end())
         {
