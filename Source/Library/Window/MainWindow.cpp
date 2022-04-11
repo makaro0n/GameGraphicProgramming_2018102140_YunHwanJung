@@ -28,13 +28,13 @@ namespace library
         HRESULT hr = S_OK;
 
         RECT rc = { 0, 0, 800, 600 };
-        AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
+        RECT rc2;
 
         hr = initialize(
             hInstance, 
             nCmdShow, 
             pszWindowName,
-            CS_HREDRAW | CS_VREDRAW,
+            WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
             0,
             0,
             800,
@@ -45,12 +45,14 @@ namespace library
         if (FAILED(hr))
             return hr;
 
+        GetClientRect(m_hWnd, &rc2);
+
         // Clip Cursor
         POINT p1, p2;
-        p1.x = rc.left;
-        p1.y = rc.top;
-        p2.x = rc.right;
-        p2.y = rc.bottom;
+        p1.x = rc2.left;
+        p1.y = rc2.top - 30L;
+        p2.x = rc2.right;
+        p2.y = rc2.bottom;
 
         ClientToScreen(m_hWnd, &p1);
         ClientToScreen(m_hWnd, &p2);
