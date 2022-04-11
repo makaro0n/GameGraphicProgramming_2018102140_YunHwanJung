@@ -13,7 +13,9 @@ namespace library
 	  Modifies: [m_pszGameName, m_mainWindow, m_renderer].
 	M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-	Game::Game(_In_ PCWSTR pszGameName)
+	Game::Game(
+		_In_ PCWSTR pszGameName
+	)
 		: m_pszGameName(pszGameName)
 		, m_mainWindow(std::make_unique<library::MainWindow>())
 		, m_renderer(std::make_unique<library::Renderer>())
@@ -36,7 +38,10 @@ namespace library
 				Status code
 	M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
-	HRESULT Game::Initialize(_In_ HINSTANCE hInstance, _In_ INT nCmdShow)
+	HRESULT Game::Initialize(
+		_In_ HINSTANCE hInstance, 
+		_In_ INT nCmdShow
+	)
 	{
 		HRESULT hr = S_OK;
 
@@ -84,6 +89,9 @@ namespace library
 				QueryPerformanceCounter(&endTime);
 				elapsedTime = static_cast<FLOAT>(endTime.QuadPart - startTime.QuadPart);
 				elapsedTime /= static_cast<FLOAT>(frequency.QuadPart);
+
+				startTime = endTime;
+
 				m_renderer->Update(elapsedTime);
 				m_renderer->Render();
 			}
