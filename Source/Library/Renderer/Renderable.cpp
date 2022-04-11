@@ -3,7 +3,7 @@
 namespace library
 {
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
-      Method:   Renderable::initialize
+      Method:   Renderable::initialize 
 
       Summary:  Initializes the buffers and the world matrix
 

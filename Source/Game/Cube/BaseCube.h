@@ -1,6 +1,6 @@
 /*+===================================================================
   File:      BASECUBE.H
-
+   
   Summary:   Base cube header file contains declarations of BaseCube
              class used for the lab samples of Game Graphics
              Programming course.

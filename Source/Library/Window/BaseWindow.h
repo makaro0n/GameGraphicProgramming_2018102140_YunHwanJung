@@ -1,5 +1,5 @@
 ﻿/*+===================================================================
-  File:      BASEWINDOW.H
+  File:      BASEWINDOW.H 
 
   Summary:   BaseWindow header file contains declarations of the
              base class of all windows used in the library.

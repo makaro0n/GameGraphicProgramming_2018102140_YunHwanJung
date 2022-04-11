@@ -3,7 +3,7 @@
 namespace library
 {
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
-      Method:   PixelShader::PixelShader
+      Method:   PixelShader::PixelShader 
 
       Summary:  Constructor
 

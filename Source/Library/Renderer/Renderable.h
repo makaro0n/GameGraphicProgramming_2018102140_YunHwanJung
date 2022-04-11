@@ -1,5 +1,5 @@
 /*+===================================================================
-  File:      RENDERABLE.H
+  File:      RENDERABLE.H 
 
   Summary:   Renderable header file contains declarations of
              Renderable class used for the lab samples of Game

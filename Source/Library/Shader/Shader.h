@@ -1,5 +1,5 @@
 /*+===================================================================
-  File:      SHADER.H
+  File:      SHADER.H 
 
   Summary:   Shader header file contains declarations of Shader
              class used for the lab samples of Game Graphics

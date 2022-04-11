@@ -17,7 +17,7 @@
 
 
 /*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
-      Class:    CustomCube
+      Class:    CustomCube 
 
       Summary:  CustomCube class
 

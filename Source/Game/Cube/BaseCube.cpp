@@ -10,7 +10,7 @@
             ID3D11DeviceContext* pImmediateContext
               The Direct3D context to set buffers
 
-  Returns:  HRESULT
+  Returns:  HRESULT 
               Status code
 M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 

@@ -3,7 +3,7 @@
 namespace library
 {
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
-      Method:   MainWindow::Initialize
+      Method:   MainWindow::Initialize 
 
       Summary:  Initializes main window
 

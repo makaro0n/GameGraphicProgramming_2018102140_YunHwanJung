@@ -22,7 +22,7 @@
       Summary:  OrbitCube class
 
       Methods:  Update
-                  Update the cube each frame
+                  Update the cube each frame 
                 OrbitCube
                   Constructor.
                 ~OrbitCube

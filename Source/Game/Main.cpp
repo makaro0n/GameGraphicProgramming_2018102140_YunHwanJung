@@ -6,7 +6,7 @@
   Origin:    http://msdn.microsoft.com/en-us/library/windows/apps/ff729718.aspx
 
   Originally created by Microsoft Corporation under MIT License
-  � 2022 Kyung Hee University
+  � 2022 Kyung Hee University 
 ===================================================================+*/
 
 #include "Common.h"

@@ -13,6 +13,8 @@ void OrbitCube::Update(
     _In_ FLOAT deltaTime
 )
 {
+	if (XMMatrixIsIdentity(m_world))
+		m_deltaTime = 0.0f;
 	m_deltaTime += deltaTime;
 
 	XMMATRIX spin = XMMatrixRotationZ(-m_deltaTime);

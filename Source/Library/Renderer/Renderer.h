@@ -2,7 +2,7 @@
   File:      RENDERER.H
 
   Summary:   Renderer header file contains declarations of Renderer
-             class used for the lab samples of Game Graphics
+             class used for the lab samples of Game Graphics 
              Programming course.
 
   Classes: Renderer

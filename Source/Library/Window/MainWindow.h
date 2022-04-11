@@ -4,7 +4,7 @@
   Summary:   BaseWindow header file contains declarations of the
              base class of all windows used in the library.
 
-  Classes: BaseWindow<DerivedType>
+  Classes: BaseWindow<DerivedType> 
 
   Functions: InitWindow, InitDevice
 

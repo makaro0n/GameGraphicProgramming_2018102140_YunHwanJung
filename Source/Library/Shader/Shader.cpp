@@ -3,7 +3,7 @@
 namespace library
 {
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
-      Method:   Shader::Shader
+      Method:   Shader::Shader 
 
       Summary:  Constructor
 

@@ -3,7 +3,7 @@
 namespace library
 {
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
-      Method:   VertexShader::VertexShader
+      Method:   VertexShader::VertexShader 
 
       Summary:  Constructor
 

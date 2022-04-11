@@ -2,7 +2,7 @@
   File:      GAME.H
 
   Summary:   Game header file contains declarations of functions
-             used for the lab samples of Game Graphics Programming
+             used for the lab samples of Game Graphics Programming 
              course.
 
   Classes:  Game

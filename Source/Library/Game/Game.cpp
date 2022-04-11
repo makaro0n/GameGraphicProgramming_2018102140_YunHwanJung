@@ -3,7 +3,7 @@
 namespace library
 {
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
-	  Method:   Game::Game
+	  Method:   Game::Game 
 
 	  Summary:  Constructor
 

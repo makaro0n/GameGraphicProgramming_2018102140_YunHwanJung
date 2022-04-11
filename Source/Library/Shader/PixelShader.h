@@ -1,5 +1,5 @@
 /*+===================================================================
-  File:      PIXELSHADER.H
+  File:      PIXELSHADER.H 
 
   Summary:   PixelShader header file contains declarations of
              PixelShader class used for the lab samples of Game

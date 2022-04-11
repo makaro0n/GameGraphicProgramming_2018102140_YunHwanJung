@@ -1,7 +1,7 @@
 #include "Cube/CustomCube.h"
 
 /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
-  Method:   CustomCube::Update
+  Method:   CustomCube::Update 
 
   Summary:  Update the cube each frame
 
@@ -13,6 +13,8 @@ void CustomCube::Update(
 	_In_ FLOAT deltaTime
 )
 {
+	if (XMMatrixIsIdentity(m_world))
+		m_deltaTime = 0.0f;
 	m_deltaTime += deltaTime;
 
 	XMVECTOR axis = XMVectorSet(1.0f, 1.0f, 0.0f, 0.0f);

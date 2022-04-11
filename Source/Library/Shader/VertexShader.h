@@ -1,5 +1,5 @@
 /*+===================================================================
-  File:      VERTEXSHADER.H
+  File:      VERTEXSHADER.H 
 
   Summary:   VertexShader header file contains declarations of 
              VertexShader class used for the lab samples of Game 

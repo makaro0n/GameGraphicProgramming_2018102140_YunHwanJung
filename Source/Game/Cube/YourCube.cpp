@@ -6,7 +6,7 @@
   Summary:  Update the cube each frame
 
   Args:     FLOAT deltaTime
-              Time difference of a frame
+              Time difference of a frame 
 M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
 void YourCube::Update(

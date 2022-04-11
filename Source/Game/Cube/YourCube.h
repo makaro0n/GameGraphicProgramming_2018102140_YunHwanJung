@@ -3,7 +3,7 @@
 
   Summary:  Child Cube header file contains declarations of
              YourCube class used for the lab samples of Game
-             Graphics Programming course.
+             Graphics Programming course. 
 
   Classes: Renderable
 
