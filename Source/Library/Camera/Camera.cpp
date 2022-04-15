@@ -174,7 +174,7 @@ namespace library
         XMMATRIX rotateYTempMatrix = XMMatrixRotationY(m_yaw);
         m_cameraRight = XMVector3TransformCoord(DEFAULT_RIGHT, rotateYTempMatrix);
         m_cameraForward = XMVector3TransformCoord(DEFAULT_FORWARD, rotateYTempMatrix);
-        m_cameraUp = XMVector3TransformCoord(m_cameraUp, rotateYTempMatrix);
+        m_cameraUp = XMVector3TransformCoord(DEFAULT_UP, rotateYTempMatrix);
 
         m_eye += m_moveLeftRight * m_cameraRight;
         m_eye += m_moveBackForward * m_cameraForward;

@@ -28,7 +28,7 @@ namespace library
         , m_depthStencil(nullptr)
         , m_depthStencilView(nullptr)
 
-        , m_camera(XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f))
+        , m_camera(XMVectorSet(0.0f, 0.0f, -10.0f, 0.0f))
         , m_projection()
 
         , m_renderables(std::unordered_map<PCWSTR, std::shared_ptr<Renderable>>())
@@ -452,6 +452,11 @@ namespace library
             0
         );
 
+        // Bind Buffer(vertex buffer, index buffer, input layout), Update Constant Buffer, 
+        // Shader, Draw => Rendering Pipeline(Auto)(Input Assembler ~ ...Shader)
+        // CPU 에서 Shader comile, create
+        // Vertex Shader : per-vertex operation(Vertex 좌표 변환, Transform, 등등)
+        // Pixel Shader : per-piexel operation (Pixel 색 지정, 빛 처리 등등)
         for (auto renderablesElem : m_renderables)
         {
             // Set the vertex buffer
