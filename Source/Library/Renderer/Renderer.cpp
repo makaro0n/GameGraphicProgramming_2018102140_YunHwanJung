@@ -3,14 +3,16 @@
 namespace library
 {
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
-      Method:   Renderer::Renderer 
+      Method:   Renderer::Renderer
 
       Summary:  Constructor
 
       Modifies: [m_driverType, m_featureLevel, m_d3dDevice, m_d3dDevice1,
-                  m_immediateContext, m_immediateContext1, m_swapChain,
-                  m_swapChain1, m_renderTargetView, m_vertexShader,
-                  m_pixelShader, m_vertexLayout, m_vertexBuffer].
+                 m_immediateContext, m_immediateContext1, m_swapChain,
+                 m_swapChain1, m_renderTargetView, m_depthStencil,
+                 m_depthStencilView, m_cbChangeOnResize, m_camera,
+                 m_projection, m_renderables, m_vertexShaders,
+                 m_pixelShaders].
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
     Renderer::Renderer()
@@ -28,12 +30,15 @@ namespace library
         , m_depthStencil(nullptr)
         , m_depthStencilView(nullptr)
 
-        , m_camera(XMVectorSet(0.0f, 0.0f, -10.0f, 0.0f))
-        , m_projection()
+        , m_cbChangeOnResize(nullptr)
+        , m_padding()
 
-        , m_renderables(std::unordered_map<PCWSTR, std::shared_ptr<Renderable>>())
-        , m_vertexShaders(std::unordered_map<PCWSTR, std::shared_ptr<VertexShader>>())
-        , m_pixelShaders(std::unordered_map<PCWSTR, std::shared_ptr<PixelShader>>())
+        , m_camera(Camera(XMVectorSet(0.0f, 1.0f, -10.0f, 0.0f)))
+        , m_projection(XMMatrixIdentity())
+
+        , m_renderables(std::unordered_map<std::wstring, std::shared_ptr<Renderable>>())
+        , m_vertexShaders(std::unordered_map<std::wstring, std::shared_ptr<VertexShader>>())
+        , m_pixelShaders(std::unordered_map<std::wstring, std::shared_ptr<PixelShader>>())
     {
     }
 
@@ -46,9 +51,10 @@ namespace library
                   Handle to the window
 
       Modifies: [m_d3dDevice, m_featureLevel, m_immediateContext,
-                  m_d3dDevice1, m_immediateContext1, m_swapChain1,
-                  m_swapChain, m_renderTargetView, m_vertexShader,
-                  m_vertexLayout, m_pixelShader, m_vertexBuffer].
+                 m_d3dDevice1, m_immediateContext1, m_swapChain1,
+                 m_swapChain, m_renderTargetView, m_cbChangeOnResize,
+                 m_projection, m_camera, m_vertexShaders,
+                 m_pixelShaders, m_renderables].
 
       Returns:  HRESULT
                   Status code
@@ -62,10 +68,10 @@ namespace library
 
         RECT rc;
         GetClientRect(hWnd, &rc);
-        UINT width = rc.right - static_cast<UINT>(rc.left);
-        UINT height = rc.bottom - static_cast<UINT>(rc.top);
+        UINT width = static_cast<UINT>(rc.right - rc.left);
+        UINT height = static_cast<UINT>(rc.bottom - rc.top);
 
-        UINT createDeviceFlags = 0;
+        UINT createDeviceFlags = 0u;
 
 #ifdef _DEBUG
         createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
@@ -186,7 +192,6 @@ namespace library
         }
 
         dxgiFactory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER);
-
         if (FAILED(hr))
             return hr;
 
@@ -246,8 +251,8 @@ namespace library
         {
             .TopLeftX = 0,
             .TopLeftY = 0,
-            .Width = (FLOAT)width,
-            .Height = (FLOAT)height,
+            .Width = static_cast<FLOAT>(width),
+            .Height = static_cast<FLOAT>(height),
             .MinDepth = 0.0f,
             .MaxDepth = 1.0f
         };
@@ -255,19 +260,26 @@ namespace library
         m_immediateContext->RSSetViewports(1, &vp);
 
         // Initialize the projection matrix
-        m_projection = XMMatrixPerspectiveFovLH(
-            XM_PIDIV2, 
-            width / (FLOAT)height,
-            0.01f, 
-            100.0f
-        );
+        m_projection = XMMatrixPerspectiveFovLH(XM_PIDIV2, static_cast<FLOAT>(width) / static_cast<FLOAT>(height), 0.01f, 100.0f);
 
-        // Initialize the view matrix
-        XMVECTOR eye = XMVectorSet(0.0f, 1.0f, -5.0f, 0.0f);
-        XMVECTOR at = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-        XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-        // m_view = view
-        XMMATRIX view = XMMatrixLookAtLH(eye, at, up);
+        D3D11_BUFFER_DESC bd =
+        {
+            .ByteWidth = sizeof(CBChangeOnResize),
+            .Usage = D3D11_USAGE_DEFAULT,
+            .BindFlags = D3D11_BIND_CONSTANT_BUFFER,
+            .CPUAccessFlags = 0,
+        };
+
+        hr = m_d3dDevice->CreateBuffer(&bd, nullptr, m_cbChangeOnResize.GetAddressOf());
+        if (FAILED(hr))
+            return hr;
+
+        CBChangeOnResize cbChangesOnResize =
+        {
+            .Projection = XMMatrixTranspose(m_projection)
+        };
+
+        m_immediateContext->UpdateSubresource(m_cbChangeOnResize.Get(), 0, nullptr, &cbChangesOnResize, 0, 0);
 
         // Initialize the shaders 
         for (auto pixelShadersElem : m_pixelShaders)
@@ -384,7 +396,6 @@ namespace library
         }
     }
 
-
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
       Method:   Renderer::HandleInput
 
@@ -439,18 +450,19 @@ namespace library
     void Renderer::Render()
     {
         // Clear the backbuffer
-        m_immediateContext->ClearRenderTargetView(
-            m_renderTargetView.Get(), 
-            Colors::MidnightBlue
-        );
+        m_immediateContext->ClearRenderTargetView(m_renderTargetView.Get(), Colors::MidnightBlue);
 
         // Clear the depth buffer to 1.0 (max depth)
-        m_immediateContext->ClearDepthStencilView(
-            m_depthStencilView.Get(), 
-            D3D11_CLEAR_DEPTH, 
-            1.0f,
-            0
-        );
+        m_immediateContext->ClearDepthStencilView(m_depthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+        // Create camera constant buffer and update 
+        m_camera.Initialize(m_d3dDevice.Get());
+        CBChangeOnCameraMovement cbChangeOnCameraMovement =
+        {
+            .View = XMMatrixTranspose(m_camera.GetView())
+        };
+        
+        m_immediateContext->UpdateSubresource(m_camera.GetConstantBuffer().Get(), 0, nullptr, &cbChangeOnCameraMovement, 0, 0);
 
         // Bind Buffer(vertex buffer, index buffer, input layout), Update Constant Buffer, 
         // Shader, Draw => Rendering Pipeline(Auto)(Input Assembler ~ ...Shader)
@@ -459,72 +471,41 @@ namespace library
         // Pixel Shader : per-piexel operation (Pixel 색 지정, 빛 처리 등등)
         for (auto renderablesElem : m_renderables)
         {
+            CBChangesEveryFrame cbChangesEveryFrame =
+            {
+                .World = XMMatrixTranspose(renderablesElem.second->GetWorldMatrix())
+            };
+
+            m_immediateContext->UpdateSubresource(renderablesElem.second->GetConstantBuffer().Get(), 0, nullptr, &cbChangesEveryFrame, 0, 0);
+
             // Set the vertex buffer
             UINT stride = sizeof(SimpleVertex);
             UINT offset = 0;
 
-            m_immediateContext->IASetVertexBuffers(
-                0,
-                1,
-                renderablesElem.second->GetVertexBuffer().GetAddressOf(),
-                &stride,
-                &offset
-            );
+            m_immediateContext->IASetVertexBuffers(0, 1, renderablesElem.second->GetVertexBuffer().GetAddressOf(), &stride, &offset);
 
             // Set the index buffer 
-            m_immediateContext->IASetIndexBuffer(
-                renderablesElem.second->GetIndexBuffer().Get(),
-                DXGI_FORMAT_R16_UINT,
-                0
-            );
+            m_immediateContext->IASetIndexBuffer(renderablesElem.second->GetIndexBuffer().Get(), DXGI_FORMAT_R16_UINT, 0);
 
             // Set the input layout
             m_immediateContext->IASetInputLayout(renderablesElem.second->GetVertexLayout().Get());
 
-            // Update constant buffer
-            ConstantBuffer cb;
-            cb.World = XMMatrixTranspose(renderablesElem.second->GetWorldMatrix());
-            cb.View = XMMatrixTranspose(m_camera.GetView());
-            cb.Projection = XMMatrixTranspose(m_projection);
-
-            m_immediateContext->UpdateSubresource(
-                renderablesElem.second->GetConstantBuffer().Get(),
-                0,
-                nullptr,
-                &cb,
-                0,
-                0
-            );
-
             // Set primitive topology
             m_immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-            // Render the triangles 
-            m_immediateContext->VSSetShader(
-                renderablesElem.second->GetVertexShader().Get(),
-                nullptr,
-                0
-            );
+            // Set shaders and constant buffers, shader resources, and samplers
+            m_immediateContext->VSSetShader(renderablesElem.second->GetVertexShader().Get(), nullptr, 0);
+            m_immediateContext->VSSetConstantBuffers(0, 1, m_camera.GetConstantBuffer().GetAddressOf());
+            m_immediateContext->VSSetConstantBuffers(1, 1, m_cbChangeOnResize.GetAddressOf());
+            m_immediateContext->VSSetConstantBuffers(2, 1, renderablesElem.second->GetConstantBuffer().GetAddressOf());
 
-            m_immediateContext->VSSetConstantBuffers(
-                0,
-                1,
-                renderablesElem.second->GetConstantBuffer().GetAddressOf()
-            );
+            m_immediateContext->PSSetShader(renderablesElem.second->GetPixelShader().Get(), nullptr, 0);
+            m_immediateContext->PSSetConstantBuffers(2, 1, renderablesElem.second->GetConstantBuffer().GetAddressOf());
+            m_immediateContext->PSSetShaderResources(0, 1, renderablesElem.second->GetTextureResourceView().GetAddressOf());
+            m_immediateContext->PSSetSamplers(0, 1, renderablesElem.second->GetSamplerState().GetAddressOf());
 
-            m_immediateContext->PSSetShader(
-                renderablesElem.second->GetPixelShader().Get(),
-                nullptr,
-                0
-            );
-
-            m_immediateContext->DrawIndexed(
-                renderablesElem.second->GetNumIndices(),
-                0,
-                0
-            );
+            m_immediateContext->DrawIndexed(renderablesElem.second->GetNumIndices(), 0, 0);
         }
-
         // Present the information rendered to the back buffer to the front buffer (the screen)
         m_swapChain->Present(0, 0);
     }

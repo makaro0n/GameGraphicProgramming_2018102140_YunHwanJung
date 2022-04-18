@@ -1,5 +1,5 @@
 ﻿/*+===================================================================
-  File:      ORBITCUBE.H
+  File:      CUSTOMCUBE.H
 
   Summary:  Child Cube header file contains declarations of
              OrbitCube class used for the lab samples of Game
@@ -32,7 +32,7 @@ C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
 class CustomCube : public BaseCube
 {
 public:
-    CustomCube() = default;
+    CustomCube(const std::filesystem::path& textureFilePath);
     CustomCube(const CustomCube& other) = delete;
     CustomCube(CustomCube&& other) = delete;
     CustomCube& operator=(const CustomCube& other) = delete;
@@ -40,7 +40,4 @@ public:
     ~CustomCube() = default;
 
     virtual void Update(_In_ FLOAT deltaTime) override;
-
-private:
-    FLOAT m_deltaTime;
 };

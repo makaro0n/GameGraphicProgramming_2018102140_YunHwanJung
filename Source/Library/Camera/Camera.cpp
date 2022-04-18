@@ -26,7 +26,7 @@ namespace library
         , m_travelSpeed(10.0f)
         , m_rotationSpeed(10.0f)
 
-        , m_padding(NULL)
+        , m_padding()
 
         , m_cameraForward(DEFAULT_FORWARD)
         , m_cameraRight(DEFAULT_RIGHT)
@@ -99,6 +99,20 @@ namespace library
     }
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Camera::GetConstantBuffer
+
+      Summary:  Returns the constant buffer
+
+      Returns:  ComPtr<ID3D11Buffer>&
+                  The constant buffer
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+
+    ComPtr<ID3D11Buffer>& Camera::GetConstantBuffer()
+    {
+        return m_cbChangeOnCameraMovement;
+    }
+
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
       Method:   Camera::HandleInput
 
       Summary:  Sets the camera state according to the given input
@@ -120,8 +134,8 @@ namespace library
         _In_ FLOAT deltaTime
     )
     {
-        m_yaw += mouseRelativeMovement.X * m_rotationSpeed * deltaTime;
-        m_pitch += mouseRelativeMovement.Y * m_rotationSpeed * deltaTime;
+        m_yaw += static_cast<FLOAT>(mouseRelativeMovement.X) * m_rotationSpeed * deltaTime;
+        m_pitch += static_cast<FLOAT>(mouseRelativeMovement.Y) * m_rotationSpeed * deltaTime;
 
         if (m_pitch < -XM_PIDIV2)
             m_pitch = -XM_PIDIV2;
@@ -149,6 +163,33 @@ namespace library
         Update(deltaTime);
     }
 
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   Camera::Initialize
+
+      Summary:  Initialize the view matrix constant buffers
+
+      Args:     ID3D11Device* pDevice
+                  Pointer to a Direct3D 11 device
+
+      Modifies: [m_cbChangeOnCameraMovement].
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+
+    HRESULT Camera::Initialize(_In_ ID3D11Device* device)
+    {
+        HRESULT hr = S_OK;
+
+        D3D11_BUFFER_DESC bd =
+        {
+            .ByteWidth = sizeof(CBChangeOnCameraMovement),
+            .Usage = D3D11_USAGE_DEFAULT,
+            .BindFlags = D3D11_BIND_CONSTANT_BUFFER,
+            .CPUAccessFlags = 0
+        };
+
+        hr = device->CreateBuffer(&bd, nullptr, m_cbChangeOnCameraMovement.GetAddressOf());
+        if (FAILED(hr))
+            return hr;
+    }
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
       Method:   Camera::Update
@@ -168,6 +209,7 @@ namespace library
     )
     {
         m_rotation = XMMatrixRotationRollPitchYaw(m_pitch, m_yaw, 0);
+
         m_at = XMVector3TransformCoord(DEFAULT_FORWARD, m_rotation);
         m_at = XMVector3Normalize(m_at);
 

@@ -27,11 +27,8 @@ namespace library
     {
         HRESULT hr = S_OK;
 
-        RECT rc = { 0, 0, 800, 600 };
-        RECT rc2;
-
         hr = initialize(
-            hInstance, 
+            hInstance,
             nCmdShow, 
             pszWindowName,
             WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
@@ -40,19 +37,28 @@ namespace library
             800,
             600,
             nullptr,
-            nullptr);
-
+            nullptr
+        );
         if (FAILED(hr))
             return hr;
 
-        GetClientRect(m_hWnd, &rc2);
+        RECT rc;
+        GetClientRect(m_hWnd, &rc);
+        UINT width = static_cast<UINT>(rc.right - rc.left);
+        UINT height = static_cast<UINT>(rc.bottom - rc.top);
 
-        // Clip Cursor
-        POINT p1, p2;
-        p1.x = rc2.left;
-        p1.y = rc2.top - 30L;
-        p2.x = rc2.right;
-        p2.y = rc2.bottom;
+        // Clip cursor to screen
+        POINT p1 =
+        {
+            .x = rc.left,
+            .y = rc.top - 30L
+        };
+
+        POINT p2 =
+        {
+            .x = rc.right,
+            .y = rc.bottom
+        };
 
         ClientToScreen(m_hWnd, &p1);
         ClientToScreen(m_hWnd, &p2);
@@ -69,7 +75,7 @@ namespace library
             .usUsagePage = 0x01,
             .usUsage = 0x02,
             .dwFlags = 0,
-            .hwndTarget = NULL,
+            .hwndTarget = m_hWnd
         };
 
         if (!RegisterRawInputDevices(&rid, 1, sizeof(rid)))
@@ -143,13 +149,7 @@ namespace library
         {
             UINT dataSize;
             
-            GetRawInputData(
-                reinterpret_cast<HRAWINPUT>(lParam), 
-                RID_INPUT, 
-                NULL, 
-                &dataSize, 
-                sizeof(RAWINPUTHEADER)
-            );
+            GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, NULL, &dataSize, sizeof(RAWINPUTHEADER));
             
             if (dataSize > 0)
             {

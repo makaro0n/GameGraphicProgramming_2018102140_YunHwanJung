@@ -30,13 +30,13 @@
     <ClCompile Include="Cube\BaseCube.cpp">
       <Filter>소스 파일\Cube</Filter>
     </ClCompile>
-    <ClCompile Include="Cube\YourCube.cpp">
-      <Filter>소스 파일\Cube</Filter>
-    </ClCompile>
     <ClCompile Include="Cube\OrbitCube.cpp">
       <Filter>소스 파일\Cube</Filter>
     </ClCompile>
     <ClCompile Include="Cube\CustomCube.cpp">
+      <Filter>소스 파일\Cube</Filter>
+    </ClCompile>
+    <ClCompile Include="Cube\Cube.cpp">
       <Filter>소스 파일\Cube</Filter>
     </ClCompile>
   </ItemGroup>
@@ -57,14 +57,19 @@
     <ClInclude Include="Cube\BaseCube.h">
       <Filter>헤더 파일\Cube</Filter>
     </ClInclude>
-    <ClInclude Include="Cube\YourCube.h">
-      <Filter>헤더 파일\Cube</Filter>
-    </ClInclude>
     <ClInclude Include="Cube\OrbitCube.h">
       <Filter>헤더 파일\Cube</Filter>
     </ClInclude>
     <ClInclude Include="Cube\CustomCube.h">
       <Filter>헤더 파일\Cube</Filter>
     </ClInclude>
+    <ClInclude Include="Cube\Cube.h">
+      <Filter>헤더 파일\Cube</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="seafloor.dds" />
+    <Image Include="pepe.dds" />
+    <Image Include="interesting.dds" />
   </ItemGroup>
 </Project>

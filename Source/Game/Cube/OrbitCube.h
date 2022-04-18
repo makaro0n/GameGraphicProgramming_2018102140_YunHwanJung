@@ -32,7 +32,7 @@ C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
 class OrbitCube : public BaseCube
 {
 public:
-    OrbitCube() = default;
+    OrbitCube(const std::filesystem::path& textureFilePath);
     OrbitCube(const OrbitCube& other) = delete;
     OrbitCube(OrbitCube&& other) = delete;
     OrbitCube& operator=(const OrbitCube& other) = delete;
@@ -40,7 +40,4 @@ public:
     ~OrbitCube() = default;
 
     virtual void Update(_In_ FLOAT deltaTime) override;
-
-private:
-    FLOAT m_deltaTime;
 };

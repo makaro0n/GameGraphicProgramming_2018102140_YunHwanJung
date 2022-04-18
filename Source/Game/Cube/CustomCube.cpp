@@ -1,6 +1,23 @@
 #include "Cube/CustomCube.h"
 
 /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+  Method:   CustomCube::CustomCube
+
+  Summary:  Constructor
+
+  Args:     const std::filesystem::path& textureFilePath
+			  Path to the texture to use
+M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+
+CustomCube::CustomCube(
+	const std::filesystem::path& textureFilePath
+)
+	: BaseCube::BaseCube(textureFilePath)
+{
+}
+
+
+/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Method:   CustomCube::Update 
 
   Summary:  Update the cube each frame
@@ -13,17 +30,17 @@ void CustomCube::Update(
 	_In_ FLOAT deltaTime
 )
 {
-	if (XMMatrixIsIdentity(m_world))
-		m_deltaTime = 0.0f;
-	m_deltaTime += deltaTime;
+	static FLOAT s_totalTime = 0.0f;
+	s_totalTime += deltaTime;
 
 	XMVECTOR axis = XMVectorSet(1.0f, 1.0f, 0.0f, 0.0f);
-	XMMATRIX orbit = XMMatrixRotationAxis(axis, m_deltaTime * 2.0f);
+	XMMATRIX orbit = XMMatrixRotationAxis(axis, s_totalTime * 2.0f);
 
 	XMMATRIX rotate = XMMatrixRotationZ(XM_PIDIV4);
-	XMMATRIX spin = XMMatrixRotationX(m_deltaTime);
+	XMMATRIX xSpin = XMMatrixRotationX(s_totalTime);
+	XMMATRIX ySpin = XMMatrixRotationY(s_totalTime * 5.0f);
 	XMMATRIX translate = XMMatrixTranslation(0.0f, 0.0f, -7.0f);
 	XMMATRIX scale = XMMatrixScaling(0.5f, 0.5f, 0.5f);
 
-	m_world = rotate * scale * spin * translate * orbit;
+	m_world = rotate * scale * xSpin * ySpin * translate * orbit;
 }

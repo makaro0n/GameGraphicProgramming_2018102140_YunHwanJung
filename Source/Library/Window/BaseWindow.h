@@ -139,8 +139,9 @@ namespace library
     BaseWindow<DerivedType>::BaseWindow() 
         : m_hInstance(nullptr)
         , m_hWnd(nullptr)
-        , m_pszWindowName(L"TutorialWindowClass")
-    { }
+        , m_pszWindowName(nullptr)
+    { 
+    }
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
         Method:   BaseWindow<DerivedType>::GetWindow()
@@ -206,6 +207,9 @@ namespace library
         _In_opt_ HMENU hMenu
     )
     {
+        m_hInstance = hInstance;
+        m_pszWindowName = pszWindowName;
+
         // Register Class
         WNDCLASSEX wcex =
         {
@@ -214,33 +218,33 @@ namespace library
             .lpfnWndProc = WindowProc,
             .cbClsExtra = 0,
             .cbWndExtra = 0,
-            .hInstance = hInstance,
-            .hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_APPLICATION)),
+            .hInstance = m_hInstance,
+            .hIcon = LoadIcon(m_hInstance, MAKEINTRESOURCE(IDI_APPLICATION)),
             .hCursor = LoadCursor(nullptr, IDC_ARROW),
             .hbrBackground = (HBRUSH)(COLOR_WINDOW + 1),
             .lpszMenuName = nullptr,
             .lpszClassName = GetWindowClassName(),
-            .hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_APPLICATION))
+            .hIconSm = LoadIcon(m_hInstance, MAKEINTRESOURCE(IDI_APPLICATION))
         };
 
         if (!RegisterClassEx(&wcex))
             return E_FAIL;
 
         // Create Window
-        m_hInstance = hInstance;
-        
+        RECT rc = { x, y, nWidth, nHeight };
+        AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
         m_hWnd = CreateWindowEx(
             0, 
             GetWindowClassName(),
             pszWindowName,
-            WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
+            dwStyle,
             x,
             y,
             nWidth,
             nHeight,
             hWndParent,
             hMenu,
-            hInstance,
+            m_hInstance,
             this
         );
 
