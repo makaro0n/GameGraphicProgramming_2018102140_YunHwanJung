@@ -46,18 +46,19 @@ namespace library
     )
     {
         HRESULT hr = S_OK;
+
         // Compile the pixel shader
         ComPtr<ID3DBlob> pPSBlob(nullptr);
-
         hr = compile(pPSBlob.GetAddressOf());
         if (FAILED(hr))
             return hr;
 
         // Create the pixel shader
         hr = pDevice->CreatePixelShader(pPSBlob->GetBufferPointer(), pPSBlob->GetBufferSize(), nullptr, m_pixelShader.GetAddressOf());
-
         if (FAILED(hr))
             return hr;
+
+        return S_OK;
     }
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M

@@ -46,9 +46,9 @@ namespace library
     )
     {
         HRESULT hr = S_OK;
+
         // Compile the vertex shader
         ComPtr<ID3DBlob> pVSBlob(nullptr);
-
         hr = compile(pVSBlob.GetAddressOf());
         if (FAILED(hr)) 
             return hr;
@@ -62,6 +62,7 @@ namespace library
         {
             { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
             { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+            { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0 },
         };
         UINT numElements = ARRAYSIZE(layout);
 
@@ -69,7 +70,8 @@ namespace library
 
         if (FAILED(hr)) 
             return hr;
-        return hr;
+
+        return S_OK;
     }
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M

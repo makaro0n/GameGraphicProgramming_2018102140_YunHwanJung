@@ -16,7 +16,9 @@ namespace library
     Camera::Camera(
         _In_ const XMVECTOR& position
     )
-        : m_yaw(0.0f)
+        : m_cbChangeOnCameraMovement(nullptr)
+
+        , m_yaw(0.0f)
         , m_pitch(0.0f)
 
         , m_moveLeftRight(0.0f)
@@ -189,6 +191,7 @@ namespace library
         hr = device->CreateBuffer(&bd, nullptr, m_cbChangeOnCameraMovement.GetAddressOf());
         if (FAILED(hr))
             return hr;
+        return hr;
     }
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
@@ -214,6 +217,7 @@ namespace library
         m_at = XMVector3Normalize(m_at);
 
         XMMATRIX rotateYTempMatrix = XMMatrixRotationY(m_yaw);
+
         m_cameraRight = XMVector3TransformCoord(DEFAULT_RIGHT, rotateYTempMatrix);
         m_cameraForward = XMVector3TransformCoord(DEFAULT_FORWARD, rotateYTempMatrix);
         m_cameraUp = XMVector3TransformCoord(DEFAULT_UP, rotateYTempMatrix);

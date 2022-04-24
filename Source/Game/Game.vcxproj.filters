@@ -22,6 +22,12 @@
     <Filter Include="헤더 파일\Cube">
       <UniqueIdentifier>{812256a8-9d79-4b6b-a91a-7169c1743f5b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Light">
+      <UniqueIdentifier>{e837ac2f-a4cd-42c4-a0f4-3ed641a72928}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Light">
+      <UniqueIdentifier>{0506e011-e610-4c93-8672-4efd5fd879ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -39,6 +45,12 @@
     <ClCompile Include="Cube\Cube.cpp">
       <Filter>소스 파일\Cube</Filter>
     </ClCompile>
+    <ClCompile Include="Light\RotatingPointLight.cpp">
+      <Filter>소스 파일\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="Cube\RotatingCube.cpp">
+      <Filter>소스 파일\Cube</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\PS.hlsl">
@@ -50,6 +62,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Shaders.fxh">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\PhongShaders.fxh">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
@@ -64,6 +79,12 @@
       <Filter>헤더 파일\Cube</Filter>
     </ClInclude>
     <ClInclude Include="Cube\Cube.h">
+      <Filter>헤더 파일\Cube</Filter>
+    </ClInclude>
+    <ClInclude Include="Light\RotatingPointLight.h">
+      <Filter>헤더 파일\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Cube\RotatingCube.h">
       <Filter>헤더 파일\Cube</Filter>
     </ClInclude>
   </ItemGroup>
