@@ -277,8 +277,10 @@ namespace library
         };
         m_immediateContext->UpdateSubresource(m_cbChangeOnResize.Get(), 0, nullptr, &cbChangesOnResize, 0, 0);
 
+        // Initialize the View Matrix
         m_camera.Initialize(m_d3dDevice.Get());
 
+        // Create the Light Constant Buffer
         bd.ByteWidth = sizeof(CBLights);
         bd.Usage = D3D11_USAGE_DEFAULT;
         bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
