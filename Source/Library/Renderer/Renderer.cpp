@@ -267,7 +267,6 @@ namespace library
             .BindFlags = D3D11_BIND_CONSTANT_BUFFER,
             .CPUAccessFlags = 0,
         };
-
         hr = m_d3dDevice->CreateBuffer(&bd, nullptr, m_cbChangeOnResize.GetAddressOf());
         if (FAILED(hr))
             return hr;
@@ -277,6 +276,16 @@ namespace library
             .Projection = XMMatrixTranspose(m_projection)
         };
         m_immediateContext->UpdateSubresource(m_cbChangeOnResize.Get(), 0, nullptr, &cbChangesOnResize, 0, 0);
+
+        m_camera.Initialize(m_d3dDevice.Get());
+
+        bd.ByteWidth = sizeof(CBLights);
+        bd.Usage = D3D11_USAGE_DEFAULT;
+        bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+        bd.CPUAccessFlags = 0;
+        hr = m_d3dDevice->CreateBuffer(&bd, nullptr, m_cbLights.GetAddressOf());
+        if (FAILED(hr))
+            return hr;
 
         // Initialize the shaders 
         for (auto pixelShadersElem : m_pixelShaders)
@@ -484,25 +493,15 @@ namespace library
         // Clear the depth buffer to 1.0 (max depth)
         m_immediateContext->ClearDepthStencilView(m_depthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-        // Create & Update the Camera Constant Buffer
-        m_camera.Initialize(m_d3dDevice.Get());
-        CBChangeOnCameraMovement cbChangeOnCameraMovement =
+        // Update the Camera Constant Buffer
+        CBChangeOnCameraMovement cbCAM =
         {
             .View = XMMatrixTranspose(m_camera.GetView())
         };
-        XMStoreFloat4(&cbChangeOnCameraMovement.CameraPosition, m_camera.GetEye());
-        m_immediateContext->UpdateSubresource(m_camera.GetConstantBuffer().Get(), 0, nullptr, &cbChangeOnCameraMovement, 0, 0);
+        XMStoreFloat4(&cbCAM.CameraPosition, m_camera.GetEye());
+        m_immediateContext->UpdateSubresource(m_camera.GetConstantBuffer().Get(), 0, nullptr, &cbCAM, 0, 0);
 
-        // Create & Update lights constant buffer
-        D3D11_BUFFER_DESC bd =
-        {
-            .ByteWidth = sizeof(CBLights),
-            .Usage = D3D11_USAGE_DEFAULT,
-            .BindFlags = D3D11_BIND_CONSTANT_BUFFER,
-            .CPUAccessFlags = 0
-        };
-        m_d3dDevice->CreateBuffer(&bd, nullptr, m_cbLights.GetAddressOf());
-
+        // Update the Light Constant Buffer
         CBLights cbLights = {};
         for (int i = 0; i < NUM_LIGHTS; i++)
         {
@@ -523,9 +522,8 @@ namespace library
                 .World = XMMatrixTranspose(renderablesElem.second->GetWorldMatrix()),
                 .OutputColor = renderablesElem.second->GetOutputColor()
             };
-
             m_immediateContext->UpdateSubresource(renderablesElem.second->GetConstantBuffer().Get(), 0, nullptr, &cbChangesEveryFrame, 0, 0);
-
+            
             // Set the vertex buffer
             UINT stride = sizeof(SimpleVertex);
             UINT offset = 0;
