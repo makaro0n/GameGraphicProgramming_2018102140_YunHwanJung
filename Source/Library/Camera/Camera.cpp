@@ -140,27 +140,44 @@ namespace library
         m_pitch += static_cast<FLOAT>(mouseRelativeMovement.Y) * m_rotationSpeed * deltaTime;
 
         if (m_pitch < -XM_PIDIV2)
+        {
             m_pitch = -XM_PIDIV2;
+
+        }
         else if (m_pitch > XM_PIDIV2)
+        {
             m_pitch = XM_PIDIV2;
+        }
 
         // Up/Down
         if (directions.bUp)
+        {
             m_moveUpDown += m_travelSpeed * deltaTime;
+        }
         if (directions.bDown)
+        {
             m_moveUpDown -= m_travelSpeed * deltaTime;
+        }
 
         // Front/Back
         if (directions.bFront)
+        {
             m_moveBackForward += m_travelSpeed * deltaTime;
+        }
         if (directions.bBack)
+        {
             m_moveBackForward -= m_travelSpeed * deltaTime;
+        }
 
         // Right/Left
         if (directions.bRight)
+        {
             m_moveLeftRight += m_travelSpeed * deltaTime;
-        if (directions.bLeft) 
+        }
+        if (directions.bLeft)
+        {
             m_moveLeftRight -= m_travelSpeed * deltaTime;
+        }
 
         Update(deltaTime);
     }
@@ -185,12 +202,15 @@ namespace library
             .ByteWidth = sizeof(CBChangeOnCameraMovement),
             .Usage = D3D11_USAGE_DEFAULT,
             .BindFlags = D3D11_BIND_CONSTANT_BUFFER,
-            .CPUAccessFlags = 0
+            .CPUAccessFlags = 0u
         };
 
         hr = device->CreateBuffer(&bd, nullptr, m_cbChangeOnCameraMovement.GetAddressOf());
         if (FAILED(hr))
+        {
             return hr;
+        }
+
         return hr;
     }
 
@@ -211,7 +231,7 @@ namespace library
         _In_ FLOAT deltaTime
     )
     {
-        m_rotation = XMMatrixRotationRollPitchYaw(m_pitch, m_yaw, 0);
+        m_rotation = XMMatrixRotationRollPitchYaw(m_pitch, m_yaw, 0.0f);
 
         m_at = XMVector3TransformCoord(DEFAULT_FORWARD, m_rotation);
         m_at = XMVector3Normalize(m_at);

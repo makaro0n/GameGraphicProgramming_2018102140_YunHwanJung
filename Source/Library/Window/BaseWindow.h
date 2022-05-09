@@ -228,7 +228,9 @@ namespace library
         };
 
         if (!RegisterClassEx(&wcex))
+        {
             return E_FAIL;
+        }
 
         // Create Window
         RECT rc = { x, y, nWidth, nHeight };
@@ -249,7 +251,9 @@ namespace library
         );
 
         if (!m_hWnd)
+        {
             return E_FAIL;
+        }
 
         ShowWindow(m_hWnd, nCmdShow);
 

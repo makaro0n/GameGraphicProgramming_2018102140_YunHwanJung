@@ -50,28 +50,34 @@ namespace library
         // Compile the vertex shader
         ComPtr<ID3DBlob> pVSBlob(nullptr);
         hr = compile(pVSBlob.GetAddressOf());
-        if (FAILED(hr)) 
+        if (FAILED(hr))
+        {
             return hr;
+        }
 
         // Create the vertex shader
         hr = pDevice->CreateVertexShader(pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), nullptr, m_vertexShader.GetAddressOf());
-        if (FAILED(hr)) 
+        if (FAILED(hr))
+        {
             return hr;
+        }
 
         D3D11_INPUT_ELEMENT_DESC layout[] =
         {
-            { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+            { "POSITION", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, 0u, D3D11_INPUT_PER_VERTEX_DATA, 0u },
+            { "TEXCOORD", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, 12u, D3D11_INPUT_PER_VERTEX_DATA, 0u },
+            { "NORMAL", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, 20u, D3D11_INPUT_PER_VERTEX_DATA, 0u },
         };
+
         UINT numElements = ARRAYSIZE(layout);
 
         hr = pDevice->CreateInputLayout(layout, numElements, pVSBlob->GetBufferPointer(), pVSBlob->GetBufferSize(), m_vertexLayout.GetAddressOf());
-
-        if (FAILED(hr)) 
+        if (FAILED(hr))
+        {
             return hr;
+        }
 
-        return S_OK;
+        return hr;
     }
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M

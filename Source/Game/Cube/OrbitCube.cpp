@@ -1,22 +1,6 @@
 #include "Cube/OrbitCube.h"
 
 /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
-  Method:   OrbitCube::OrbitCube
-
-  Summary:  Constructor
-
-  Args:     const std::filesystem::path& textureFilePath
-			  Path to the texture to use
-M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
-
-OrbitCube::OrbitCube(
-	const std::filesystem::path& textureFilePath
-)
-	: BaseCube::BaseCube(textureFilePath)
-{
-}
-
-/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
   Method:   OrbitCube::Update
 
   Summary:  Update the cube each frame

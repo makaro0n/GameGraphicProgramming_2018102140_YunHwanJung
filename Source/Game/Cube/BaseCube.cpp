@@ -1,10 +1,5 @@
 #include "Cube/BaseCube.h"
 
-BaseCube::BaseCube(_In_ const std::filesystem::path& textureFilePath)
-    : Renderable(textureFilePath)
-{
-}
-
 BaseCube::BaseCube(_In_ const XMFLOAT4& outputColor)
     : Renderable(outputColor)
 {
@@ -29,7 +24,6 @@ const library::SimpleVertex* BaseCube::getVertices() const
 {
     return VERTICES;
 }
-
 
 const WORD* BaseCube::getIndices() const
 {

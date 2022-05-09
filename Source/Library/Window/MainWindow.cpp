@@ -40,7 +40,9 @@ namespace library
             nullptr
         );
         if (FAILED(hr))
+        {
             return hr;
+        }
 
         RECT rc;
         GetClientRect(m_hWnd, &rc);
@@ -78,8 +80,10 @@ namespace library
             .hwndTarget = m_hWnd
         };
 
-        if (!RegisterRawInputDevices(&rid, 1, sizeof(rid)))
+        if (!RegisterRawInputDevices(&rid, 1u, sizeof(rid)))
+        {
             return E_FAIL;
+        }
 
         return hr;
     }
@@ -154,13 +158,11 @@ namespace library
             if (dataSize > 0)
             {
                 std::unique_ptr<BYTE[]> rawdata = std::make_unique<BYTE[]>(dataSize);
-                if (GetRawInputData(
-                    reinterpret_cast<HRAWINPUT>(lParam),
-                    RID_INPUT,
-                    rawdata.get(),
-                    &dataSize,
-                    sizeof(RAWINPUTHEADER)) == dataSize
-                    )
+                if (GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam),
+                                    RID_INPUT,
+                                    rawdata.get(),
+                                    &dataSize,
+                                    sizeof(RAWINPUTHEADER)) == dataSize)
                 {
                     RAWINPUT* raw = reinterpret_cast<RAWINPUT*>(rawdata.get());
                     if (raw->header.dwType == RIM_TYPEMOUSE)

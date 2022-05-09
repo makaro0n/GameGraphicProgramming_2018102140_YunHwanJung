@@ -46,14 +46,18 @@ namespace library
 		HRESULT hr = S_OK;
 
 		hr = m_mainWindow->Initialize(hInstance, nCmdShow, m_pszGameName);
-		if (FAILED(hr)) 
+		if (FAILED(hr))
+		{
 			return hr;
+		}
 
 		hr = m_renderer->Initialize(m_mainWindow->GetWindow());
-		if (FAILED(hr)) 
+		if (FAILED(hr))
+		{
 			return hr;
+		}
 
-		return S_OK;
+		return hr;
 	}
 
 	/*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
@@ -79,7 +83,7 @@ namespace library
 
 		while (WM_QUIT != msg.message)
 		{
-			if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+			if (PeekMessage(&msg, nullptr, 0u, 0u, PM_REMOVE))
 			{
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);

@@ -32,7 +32,6 @@ C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
 class OrbitCube : public BaseCube
 {
 public:
-    OrbitCube(const std::filesystem::path& textureFilePath);
     OrbitCube(const OrbitCube& other) = delete;
     OrbitCube(OrbitCube&& other) = delete;
     OrbitCube& operator=(const OrbitCube& other) = delete;
