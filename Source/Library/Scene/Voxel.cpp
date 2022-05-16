@@ -61,7 +61,16 @@ namespace library
         HRESULT hr;
 
         hr = initialize(pDevice, pImmediateContext);
+        if (FAILED(hr))
+        {
+            return hr;
+        }
+
         hr = initializeInstance(pDevice);
+        if (FAILED(hr))
+        {
+            return hr;
+        }
 
         return hr;
     }
