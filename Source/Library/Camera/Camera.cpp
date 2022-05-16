@@ -245,13 +245,13 @@ namespace library
         m_eye += m_moveLeftRight * m_cameraRight;
         m_eye += m_moveBackForward * m_cameraForward;
         m_eye += m_moveUpDown * m_cameraUp;
+        m_at = m_eye + m_at;
+        m_up = m_cameraUp;
 
         m_moveLeftRight = 0.0f;
         m_moveBackForward = 0.0f;
         m_moveUpDown = 0.0f;
-
-        m_at = m_eye + m_at;
-
+        
         m_view = XMMatrixLookAtLH(m_eye, m_at, m_up);
     }
 }

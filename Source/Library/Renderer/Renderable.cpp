@@ -100,7 +100,7 @@ namespace library
         bd.ByteWidth = sizeof(CBChangesEveryFrame);
         bd.Usage = D3D11_USAGE_DEFAULT;
         bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-        bd.CPUAccessFlags = 0;
+        bd.CPUAccessFlags = 0u;
 
         hr = pDevice->CreateBuffer(&bd, nullptr, m_constantBuffer.GetAddressOf());
         if (FAILED(hr))
