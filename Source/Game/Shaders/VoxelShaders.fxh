@@ -10,8 +10,8 @@
 // Global Variables
 //--------------------------------------------------------------------------------------
 
-Texture2D diffuseTexture : register(t0);
-SamplerState diffuseSampler : register(s0);
+Texture2D txDiffuse : register(t0);
+SamplerState samLinear : register(s0);
 
 //--------------------------------------------------------------------------------------
 // Constant Buffer Variables
@@ -129,21 +129,21 @@ float4 PSVoxel(PS_INPUT input) : SV_TARGET
 
     float3 specular = float3(0.0f, 0.0f, 0.0f);
 
-    float3 viewDirection = normalize(input.WorldPosition.xyz - CameraPosition.xyz);
-    
+    float3 viewDirection = normalize(CameraPosition.xyz - input.WorldPosition.xyz);
+        
     for (uint i = 0; i < NUM_LIGHTS; ++i)
     {
-        float3 lightDirection = normalize(LightPositions[i].xyz - input.WorldPosition);        
-        float3 reflectDirection = reflect(-lightDirection, input.Normal);
+        float3 lightDirection = normalize(input.WorldPosition - LightPositions[i].xyz);
+        float3 reflectDirection = reflect(lightDirection, input.Normal);
 
         // calculate ambient
         ambient += float3(0.2f, 0.2f, 0.2f);
 
         // calculate diffuse 
-        diffuse += saturate(dot(input.Normal, lightDirection)) * LightColors[i].xyz;
+        diffuse += saturate(dot(input.Normal, -lightDirection)) * LightColors[i].xyz;
 
         // calculate specular 
-        specular += pow(saturate(dot(reflectDirection, -viewDirection)), 40.0f) * LightColors[i].xyz;
+        specular += pow(saturate(dot(reflectDirection, viewDirection)), 20.0f) * LightColors[i].xyz;
     }
 
     return float4(ambient + diffuse + specular, 1.0f) * OutputColor;

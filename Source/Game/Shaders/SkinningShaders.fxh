@@ -1,14 +1,14 @@
 //--------------------------------------------------------------------------------------
-// File: PhongShaders.fx
+// File: SkinningShaders.fx
 //
-// Copyright (c) Kyung Hee University.
+// Copyright (c) Microsoft Corporation.
 //--------------------------------------------------------------------------------------
-
 #define NUM_LIGHTS (2)
 
 //--------------------------------------------------------------------------------------
 // Global Variables
 //--------------------------------------------------------------------------------------
+static const unsigned int MAX_NUM_BONES = 256u;
 
 Texture2D txDiffuse : register(t0);
 SamplerState samLinear : register(s0);
@@ -19,7 +19,7 @@ SamplerState samLinear : register(s0);
 /*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
   Cbuffer:  cbChangeOnCameraMovement
 
-  Summary:  Constant buffer used for view transformation and shading
+  Summary:  Constant buffer used for view transformation
 C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
 
 cbuffer cbChangeOnCameraMovement : register(b0)
@@ -63,18 +63,31 @@ cbuffer cbLights : register(b3)
     float4 LightColors[NUM_LIGHTS];
 };
 
+/*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
+  Cbuffer:  cbSkinning
+
+  Summary:  Constant buffer used for skinning
+C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
+
+cbuffer cbSkinning : register(b4)
+{
+    matrix BoneTransforms[MAX_NUM_BONES];
+};
+
 //--------------------------------------------------------------------------------------
 /*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
-  Struct:   VS_PHONG_INPUT
+  Struct:   VS_INPUT
 
   Summary:  Used as the input to the vertex shader
 C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
 
-struct VS_PHONG_INPUT
+struct VS_INPUT
 {
     float4 Position : POSITION;
     float2 TexCoord : TEXCOORD0;
     float3 Normal : NORMAL;
+    uint4 BoneIndices : BONEINDICES;
+    float4 BoneWeights : BONEWEIGHTS;
 };
 
 /*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
@@ -92,46 +105,29 @@ struct PS_PHONG_INPUT
     float3 WorldPosition : WORLDPOS;
 };
 
-/*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
-  Struct:   PS_LIGHT_CUBE_INPUT
-
-  Summary:  Used as the input to the pixel shader, output of the 
-            vertex shader
-C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
-
-struct PS_LIGHT_CUBE_INPUT
-{
-    float4 Position : SV_POSITION;
-};
-
 //--------------------------------------------------------------------------------------
 // Vertex Shader
 //--------------------------------------------------------------------------------------
 
-PS_PHONG_INPUT VSPhong(VS_PHONG_INPUT input)
+PS_PHONG_INPUT VSPhong(VS_INPUT input)
 {
-    PS_PHONG_INPUT output = (PS_PHONG_INPUT)0;
+    PS_PHONG_INPUT output = (PS_PHONG_INPUT) 0;
 
-    output.Position = mul(input.Position, World);
+    matrix skinTransform = (matrix) 0;
+    skinTransform += BoneTransforms[input.BoneIndices.x] * input.BoneWeights.x;
+    skinTransform += BoneTransforms[input.BoneIndices.y] * input.BoneWeights.y;
+    skinTransform += BoneTransforms[input.BoneIndices.z] * input.BoneWeights.z;
+    skinTransform += BoneTransforms[input.BoneIndices.w] * input.BoneWeights.w;
+    
+    output.Position = mul(input.Position, skinTransform);
+    output.Position = mul(output.Position, World);
+    output.WorldPosition = output.Position;
     output.Position = mul(output.Position, View);
     output.Position = mul(output.Position, Projection);
-    
-    output.WorldPosition = mul(input.Position, World);
 
     output.TexCoord = input.TexCoord;
-
-    output.Normal = mul(float4(input.Normal, 0.0f), World).xyz;
-
-    return output;
-}
-
-PS_LIGHT_CUBE_INPUT VSLightCube( VS_PHONG_INPUT input )
-{
-    PS_LIGHT_CUBE_INPUT output = (PS_LIGHT_CUBE_INPUT)0;
-
-    output.Position = mul( input.Position, World );
-    output.Position = mul( output.Position, View );
-    output.Position = mul( output.Position, Projection );
+    
+    output.Normal = normalize(mul(float4(input.Normal, 0.0f), World).xyz);
 
     return output;
 }
@@ -140,7 +136,7 @@ PS_LIGHT_CUBE_INPUT VSLightCube( VS_PHONG_INPUT input )
 // Pixel Shader
 //--------------------------------------------------------------------------------------
 
-float4 PSPhong( PS_PHONG_INPUT input ) : SV_TARGET
+float4 PSPhong(PS_PHONG_INPUT input) : SV_TARGET
 {
     float3 ambient = float3(0.0f, 0.0f, 0.0f);
 
@@ -166,9 +162,4 @@ float4 PSPhong( PS_PHONG_INPUT input ) : SV_TARGET
     }
 
     return float4(ambient + diffuse + specular, 1.0f) * txDiffuse.Sample(samLinear, input.TexCoord);
-}
-
-float4 PSLightCube( PS_LIGHT_CUBE_INPUT input ) : SV_TARGET
-{
-    return OutputColor;
 }

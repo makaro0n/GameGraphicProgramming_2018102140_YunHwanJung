@@ -84,9 +84,7 @@ namespace library
 
         // Create the index buffer
         bd.ByteWidth = sizeof(WORD) * GetNumIndices();
-        bd.Usage = D3D11_USAGE_DEFAULT;
         bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-        bd.CPUAccessFlags = 0u;      
 
         initData.pSysMem = getIndices();
 
@@ -98,9 +96,7 @@ namespace library
 
         // Create constant buffer
         bd.ByteWidth = sizeof(CBChangesEveryFrame);
-        bd.Usage = D3D11_USAGE_DEFAULT;
         bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-        bd.CPUAccessFlags = 0u;
 
         hr = pDevice->CreateBuffer(&bd, nullptr, m_constantBuffer.GetAddressOf());
         if (FAILED(hr))
