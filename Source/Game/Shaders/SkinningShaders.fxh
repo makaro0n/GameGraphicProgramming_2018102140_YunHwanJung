@@ -113,11 +113,11 @@ PS_PHONG_INPUT VSPhong(VS_INPUT input)
 {
     PS_PHONG_INPUT output = (PS_PHONG_INPUT) 0;
 
-    matrix skinTransform = (matrix) 0;
-    skinTransform += BoneTransforms[input.BoneIndices.x] * input.BoneWeights.x;
-    skinTransform += BoneTransforms[input.BoneIndices.y] * input.BoneWeights.y;
-    skinTransform += BoneTransforms[input.BoneIndices.z] * input.BoneWeights.z;
-    skinTransform += BoneTransforms[input.BoneIndices.w] * input.BoneWeights.w;
+	matrix skinTransform = (matrix) 0;
+	skinTransform += mul(input.BoneWeights.x, BoneTransforms[input.BoneIndices.x]);
+	skinTransform += mul(input.BoneWeights.y, BoneTransforms[input.BoneIndices.y]);
+	skinTransform += mul(input.BoneWeights.z, BoneTransforms[input.BoneIndices.z]);
+	skinTransform += mul(input.BoneWeights.w, BoneTransforms[input.BoneIndices.w]);
     
     output.Position = mul(input.Position, skinTransform);
     output.Position = mul(output.Position, World);
@@ -146,14 +146,14 @@ float4 PSPhong(PS_PHONG_INPUT input) : SV_TARGET
 
     float3 viewDirection = normalize(CameraPosition.xyz - input.WorldPosition.xyz);
         
+    // calculate ambient
+	ambient += float3(0.2f, 0.2f, 0.2f);
+    
     for (uint i = 0; i < NUM_LIGHTS; ++i)
     {
         float3 lightDirection = normalize(input.WorldPosition - LightPositions[i].xyz);
         float3 reflectDirection = reflect(lightDirection, input.Normal);
-
-        // calculate ambient
-        ambient += float3(0.2f, 0.2f, 0.2f);
-
+        
         // calculate diffuse 
         diffuse += saturate(dot(input.Normal, -lightDirection)) * LightColors[i].xyz;
 

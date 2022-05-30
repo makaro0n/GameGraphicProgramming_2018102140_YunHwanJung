@@ -32,10 +32,7 @@ namespace library
             nCmdShow, 
             pszWindowName,
             WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
-            0,
-            0,
-            800,
-            600,
+            0, 0, 800, 600,
             nullptr,
             nullptr
         );
@@ -46,8 +43,6 @@ namespace library
 
         RECT rc;
         GetClientRect(m_hWnd, &rc);
-        UINT width = static_cast<UINT>(rc.right - rc.left);
-        UINT height = static_cast<UINT>(rc.bottom - rc.top);
 
         // Clip cursor to screen
         POINT p1 =
@@ -74,8 +69,8 @@ namespace library
 
         // Raw Input Device
         RAWINPUTDEVICE rid = {
-            .usUsagePage = 0x01,
-            .usUsage = 0x02,
+            .usUsagePage = static_cast<USHORT>(0x01),
+            .usUsage = static_cast<USHORT>(0x02) ,
             .dwFlags = 0,
             .hwndTarget = m_hWnd
         };
@@ -151,9 +146,9 @@ namespace library
 
         case WM_INPUT:
         {
-            UINT dataSize;
+            UINT dataSize = 0u;
             
-            GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, NULL, &dataSize, sizeof(RAWINPUTHEADER));
+            GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, nullptr, &dataSize, sizeof(RAWINPUTHEADER));
             
             if (dataSize > 0)
             {

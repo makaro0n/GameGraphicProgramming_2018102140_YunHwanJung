@@ -10,8 +10,8 @@
 // Global Variables
 //--------------------------------------------------------------------------------------
 
-Texture2D txDiffuse : register(t0);
-SamplerState samLinear : register(s0);
+Texture2D aTextures[2] : register(t0);
+SamplerState aSamplers[2] : register(s0);
 
 //--------------------------------------------------------------------------------------
 // Constant Buffer Variables
@@ -50,6 +50,7 @@ cbuffer cbChangesEveryFrame : register(b2)
 {
     matrix World;
     float4 OutputColor;
+    bool HasNormalMap;
 };
 
 /*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
@@ -77,6 +78,8 @@ struct VS_INPUT
     float4 Position : POSITION;
     float2 TexCoord : TEXCOORD0;
     float3 Normal : NORMAL;
+    float3 Tangent : TANGENT;
+    float3 Bitangent : BITANGENT;
     row_major matrix Transform : INSTANCE_TRANSFORM;
 };
 
@@ -93,6 +96,8 @@ struct PS_INPUT
     float2 TexCoord : TEXCOORD0;
     float3 Normal : NORMAL;
     float3 WorldPosition : WORLDPOS;
+    float3 Tangent : TANGENT;
+    float3 Bitangent : BITANGENT;
 };
 
 //--------------------------------------------------------------------------------------
@@ -111,8 +116,15 @@ PS_INPUT VSVoxel(VS_INPUT input)
 
     output.TexCoord = input.TexCoord;
 
+    output.Normal = normalize(mul(float4(input.Normal, 0.0f), input.Transform).xyz);
     output.Normal = normalize(mul(float4(input.Normal, 0.0f), World).xyz);
-        
+
+    if (HasNormalMap)
+    {
+        output.Tangent = normalize(mul(float4(input.Tangent, 0.0f), World).xyz);
+        output.Bitangent = normalize(mul(float4(input.Bitangent, 0.0f), World).xyz);
+    }
+
     return output;
 }
 
@@ -130,21 +142,38 @@ float4 PSVoxel(PS_INPUT input) : SV_TARGET
     float3 specular = float3(0.0f, 0.0f, 0.0f);
 
     float3 viewDirection = normalize(CameraPosition.xyz - input.WorldPosition.xyz);
+    
+    float3 normal = normalize(input.Normal);
+    
+    if (HasNormalMap)
+    {
+        // Sample the pixel in the normal map.
+        float4 bumpMap = aTextures[1].Sample(aSamplers[1], input.TexCoord);
         
-    for (uint i = 0; i < NUM_LIGHTS; ++i)
+        // Expand the range of the normal value from (0, +1) to (-1, +1).  
+        bumpMap = (bumpMap * 2.0f) - 1.0f;       
+        
+        // Calculate the normal from the data in the normal map.   
+        float3 bumpNormal = (bumpMap.x * input.Tangent) + (bumpMap.y * input.Bitangent) + (bumpMap.z * normal);
+        
+        // Normalize the resulting bump normal and replace existing normal   
+        normal = normalize(bumpNormal);
+    }
+    
+    // calculate ambient
+    ambient += float3(0.2f, 0.2f, 0.2f);
+
+    for (uint i = 0u; i < NUM_LIGHTS; ++i)
     {
         float3 lightDirection = normalize(input.WorldPosition - LightPositions[i].xyz);
         float3 reflectDirection = reflect(lightDirection, input.Normal);
 
-        // calculate ambient
-        ambient += float3(0.2f, 0.2f, 0.2f);
-
         // calculate diffuse 
-        diffuse += saturate(dot(input.Normal, -lightDirection)) * LightColors[i].xyz;
+        diffuse += saturate(dot(normal, -lightDirection)) * LightColors[i].xyz;
 
         // calculate specular 
         specular += pow(saturate(dot(reflectDirection, viewDirection)), 20.0f) * LightColors[i].xyz;
     }
 
-    return float4(ambient + diffuse + specular, 1.0f) * OutputColor;
+    return float4(ambient + diffuse + specular, 1.0f) * aTextures[0].Sample(aSamplers[0], input.TexCoord);
 }

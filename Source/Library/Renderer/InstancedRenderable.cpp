@@ -60,7 +60,7 @@ namespace library
         _In_ std::vector<InstanceData>&& aInstanceData
     )
     {
-        m_aInstanceData = aInstanceData;
+        m_aInstanceData = std::move(aInstanceData);
     }
 
 
@@ -115,7 +115,7 @@ namespace library
         // Create the Instance Buffer
         D3D11_BUFFER_DESC bd =
         {
-            .ByteWidth = static_cast<UINT>(sizeof(InstanceData)) * GetNumInstances(),
+            .ByteWidth = static_cast<UINT>(sizeof(InstanceData) * m_aInstanceData.size()),
             .Usage = D3D11_USAGE_DEFAULT,
             .BindFlags = D3D11_BIND_VERTEX_BUFFER,
             .CPUAccessFlags = 0u
@@ -125,7 +125,6 @@ namespace library
         {
             .pSysMem = m_aInstanceData.data()
         };
-
 
         hr = pDevice->CreateBuffer(&bd, &initData, m_instanceBuffer.GetAddressOf());
         if (FAILED(hr))

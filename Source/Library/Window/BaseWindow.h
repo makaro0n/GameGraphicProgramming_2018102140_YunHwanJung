@@ -36,6 +36,7 @@ namespace library
                 ~BaseWindow
                     Destructor.
     C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
+
     template <class DerivedType>
     class BaseWindow
     {
@@ -235,6 +236,7 @@ namespace library
         // Create Window
         RECT rc = { x, y, nWidth, nHeight };
         AdjustWindowRect(&rc, WS_OVERLAPPEDWINDOW, FALSE);
+
         m_hWnd = CreateWindowEx(
             0, 
             GetWindowClassName(),

@@ -2,12 +2,18 @@
 
 namespace library
 {
-    SkinningVertexShader::SkinningVertexShader(_In_ PCWSTR pszFileName, _In_ PCSTR pszEntryPoint, _In_ PCSTR pszShaderModel)
+    SkinningVertexShader::SkinningVertexShader(
+        _In_ PCWSTR pszFileName,
+        _In_ PCSTR pszEntryPoint,
+        _In_ PCSTR pszShaderModel
+    )
         : VertexShader(pszFileName, pszEntryPoint, pszShaderModel)
     {
     }
 
-    HRESULT SkinningVertexShader::Initialize(_In_ ID3D11Device* pDevice)
+    HRESULT SkinningVertexShader::Initialize(
+        _In_ ID3D11Device* pDevice
+    )
     {
         ComPtr<ID3DBlob> vsBlob;
         HRESULT hr = compile(vsBlob.GetAddressOf());
@@ -37,12 +43,11 @@ namespace library
         // Define the input layout
         D3D11_INPUT_ELEMENT_DESC aLayouts[] =
         {
-            { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-
-            { "BONEINDICES", 0, DXGI_FORMAT_R32G32B32A32_UINT, 1, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "BONEWEIGHTS", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+            { "POSITION", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, 0u, D3D11_INPUT_PER_VERTEX_DATA, 0u },
+            { "TEXCOORD", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, 12u, D3D11_INPUT_PER_VERTEX_DATA, 0u },
+            { "NORMAL", 0u, DXGI_FORMAT_R32G32B32_FLOAT, 0u, 20u, D3D11_INPUT_PER_VERTEX_DATA, 0u },
+            { "BONEINDICES", 0u, DXGI_FORMAT_R32G32B32A32_UINT, 1u, 0u, D3D11_INPUT_PER_VERTEX_DATA, 0u },
+            { "BONEWEIGHTS", 0u, DXGI_FORMAT_R32G32B32A32_FLOAT, 1u, 16u, D3D11_INPUT_PER_VERTEX_DATA, 0u }
         };
         UINT uNumElements = ARRAYSIZE(aLayouts);
 
