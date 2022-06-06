@@ -6,14 +6,23 @@ namespace library
 {
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
       Method:   PointLight::PointLight
+
       Summary:  Constructor
-      Modifies: [m_position, m_color, m_eye, m_at,
-                 m_up, m_view, m_projection].
+
+      Args:     const XMFLOAT4& position
+                  Position of the light
+                const XMFLOAT4& color
+                  Position of the color
+                FLOAT attenuationDistance
+                  Attenuation distance
+
+      Modifies: [m_position, m_color, m_attenuationDistance].
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
     PointLight::PointLight(
         _In_ const XMFLOAT4& position,
-        _In_ const XMFLOAT4& color
+        _In_ const XMFLOAT4& color,
+        _In_ FLOAT attenuationDistance
     )
         : m_position(position)
         , m_color(color)
@@ -22,6 +31,7 @@ namespace library
         , m_up(DEFAULT_UP)
         , m_view(XMMatrixIdentity())
         , m_projection(XMMatrixIdentity())
+        , m_attenuationDistance(attenuationDistance)
     {
     }
 
@@ -80,6 +90,20 @@ namespace library
     }
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
+      Method:   PointLight::GetAttenuationDistance
+
+      Summary:  Returns the attenuation distance
+
+      Returns:  FLOAT
+                  Attenuation distance
+    M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
+
+    FLOAT PointLight::GetAttenuationDistance() const
+    {
+        return m_attenuationDistance;
+    }
+
+    /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
       Method:   PointLight::Initialize
 
       Summary:  Initialize the projection matrix
@@ -91,14 +115,13 @@ namespace library
     M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M---M-M*/
 
     void PointLight::Initialize(
-        _In_ UINT uWidth, 
+        _In_ UINT uWidth,
         _In_ UINT uHeight
-    )        
+    )
     {
         // Initialize the projection matrix
         m_projection = XMMatrixPerspectiveFovLH(XM_PIDIV4, static_cast<FLOAT>(uWidth) / static_cast<FLOAT>(uHeight), 0.01f, 1000.0f);
     }
-
 
     /*M+M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M+++M
       Method:   PointLight::Update

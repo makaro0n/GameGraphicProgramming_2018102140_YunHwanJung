@@ -32,6 +32,15 @@ namespace library
         XMFLOAT3 Bitangent;
     };
 
+    struct PointLightData
+    {
+        XMFLOAT4 Position;
+        XMFLOAT4 Color;
+        XMMATRIX View;
+        XMMATRIX Projection;
+        XMFLOAT4 AttenuationDistance;
+    };
+
     struct CBChangeOnCameraMovement
     {
         XMMATRIX View;
@@ -57,10 +66,13 @@ namespace library
 
     struct CBLights
     {
-        XMFLOAT4 LightPositions[NUM_LIGHTS];
-        XMFLOAT4 LightColors[NUM_LIGHTS];
-        XMMATRIX LightViews[NUM_LIGHTS];
-        XMMATRIX LightProjections[NUM_LIGHTS];
+        // XMFLOAT4 LightPositions[NUM_LIGHTS];
+        // XMFLOAT4 LightColors[NUM_LIGHTS];
+        // XMMATRIX LightViews[NUM_LIGHTS];
+        // XMMATRIX LightProjections[NUM_LIGHTS];
+        // XMFLOAT4 AttenuationDistance;
+        
+        PointLightData PointLights[NUM_LIGHTS];
     };
 
     struct CBShadowMatrix

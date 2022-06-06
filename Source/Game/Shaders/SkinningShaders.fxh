@@ -3,11 +3,13 @@
 //
 // Copyright (c) Microsoft Corporation.
 //--------------------------------------------------------------------------------------
-#define NUM_LIGHTS (2)
 
 //--------------------------------------------------------------------------------------
 // Global Variables
 //--------------------------------------------------------------------------------------
+
+#define NUM_LIGHTS (1)
+
 static const unsigned int MAX_NUM_BONES = 256u;
 
 Texture2D txDiffuse : register(t0);
@@ -57,10 +59,18 @@ cbuffer cbChangesEveryFrame : register(b2)
   Summary:  Constant buffer used for shading
 C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
 
+struct PointLight
+{
+    float4 Position;
+    float4 Color;
+    matrix View;
+    matrix Projection;
+    float4 AttenuationDistance;
+};
+
 cbuffer cbLights : register(b3)
 {
-    float4 LightPositions[NUM_LIGHTS];
-    float4 LightColors[NUM_LIGHTS];
+    PointLight PointLights[NUM_LIGHTS];
 };
 
 /*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
@@ -151,14 +161,14 @@ float4 PSPhong(PS_PHONG_INPUT input) : SV_TARGET
     
     for (uint i = 0; i < NUM_LIGHTS; ++i)
     {
-        float3 lightDirection = normalize(input.WorldPosition - LightPositions[i].xyz);
+        float3 lightDirection = normalize(input.WorldPosition - PointLights[i].Position.xyz);
         float3 reflectDirection = reflect(lightDirection, input.Normal);
         
         // calculate diffuse 
-        diffuse += saturate(dot(input.Normal, -lightDirection)) * LightColors[i].xyz;
+        diffuse += saturate(dot(input.Normal, -lightDirection)) * PointLights[i].Color.xyz;
 
         // calculate specular 
-        specular += pow(saturate(dot(reflectDirection, viewDirection)), 20.0f) * LightColors[i].xyz;
+        specular += pow(saturate(dot(reflectDirection, viewDirection)), 20.0f) * PointLights[i].Color.xyz;
     }
 
     return float4(ambient + diffuse + specular, 1.0f) * txDiffuse.Sample(samLinear, input.TexCoord);

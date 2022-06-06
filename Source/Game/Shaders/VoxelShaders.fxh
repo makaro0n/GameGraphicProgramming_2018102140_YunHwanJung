@@ -4,11 +4,11 @@
 // Copyright (c) Kyung Hee University.
 //--------------------------------------------------------------------------------------
 
-#define NUM_LIGHTS (2)
-
 //--------------------------------------------------------------------------------------
 // Global Variables
 //--------------------------------------------------------------------------------------
+
+#define NUM_LIGHTS (1)
 
 Texture2D aTextures[2] : register(t0);
 SamplerState aSamplers[2] : register(s0);
@@ -59,10 +59,18 @@ cbuffer cbChangesEveryFrame : register(b2)
   Summary:  Constant buffer used for shading
 C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
 
+struct PointLight
+{
+    float4 Position;
+    float4 Color;
+    matrix View;
+    matrix Projection;
+    float4 AttenuationDistance;
+};
+
 cbuffer cbLights : register(b3)
 {
-    float4 LightPositions[NUM_LIGHTS];
-    float4 LightColors[NUM_LIGHTS];
+    PointLight PointLights[NUM_LIGHTS];
 };
 
 //--------------------------------------------------------------------------------------
@@ -115,7 +123,7 @@ PS_INPUT VSVoxel(VS_INPUT input)
     output.Position = mul(output.Position, Projection);
 
     output.TexCoord = input.TexCoord;
-
+    
     output.Normal = normalize(mul(float4(input.Normal, 0.0f), input.Transform).xyz);
     output.Normal = normalize(mul(float4(input.Normal, 0.0f), World).xyz);
 
@@ -165,14 +173,14 @@ float4 PSVoxel(PS_INPUT input) : SV_TARGET
 
     for (uint i = 0u; i < NUM_LIGHTS; ++i)
     {
-        float3 lightDirection = normalize(input.WorldPosition - LightPositions[i].xyz);
+        float3 lightDirection = normalize(input.WorldPosition - PointLights[i].Position.xyz);
         float3 reflectDirection = reflect(lightDirection, input.Normal);
 
         // calculate diffuse 
-        diffuse += saturate(dot(normal, -lightDirection)) * LightColors[i].xyz;
+        diffuse += saturate(dot(normal, -lightDirection)) * PointLights[i].Color.xyz;
 
         // calculate specular 
-        specular += pow(saturate(dot(reflectDirection, viewDirection)), 20.0f) * LightColors[i].xyz;
+        specular += pow(saturate(dot(reflectDirection, viewDirection)), 20.0f) * PointLights[i].Color.xyz;
     }
 
     return float4(ambient + diffuse + specular, 1.0f) * aTextures[0].Sample(aSamplers[0], input.TexCoord);

@@ -1,16 +1,24 @@
 //--------------------------------------------------------------------------------------
-// File: Shadersasd.fx
+// File: PhongShaders.fx
 //
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License (MIT).
+// Copyright (c) Kyung Hee University.
 //--------------------------------------------------------------------------------------
+
+#define NUM_LIGHTS (1)
+#define NEAR_PLANE (0.01f)
+#define FAR_PLANE (1000.0f)
 
 //--------------------------------------------------------------------------------------
 // Global Variables
 //--------------------------------------------------------------------------------------
+Texture2D aTextures[2] : register(t0);
+SamplerState aSamplers[2] : register(s0);
 
-Texture2D txDiffuse : register(t0);
-SamplerState samLinear : register(s0);
+Texture2D shadowMapTexture : register(t2);
+SamplerState shadowMapSampler : register(s2);
+
+TextureCube environmentMapTexture : register(t3);
+SamplerState environmentMapSampler : register(s3);
 
 //--------------------------------------------------------------------------------------
 // Constant Buffer Variables
@@ -18,12 +26,13 @@ SamplerState samLinear : register(s0);
 /*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
   Cbuffer:  cbChangeOnCameraMovement
 
-  Summary:  Constant buffer used for view transformation
+  Summary:  Constant buffer used for view transformation and shading
 C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
 
 cbuffer cbChangeOnCameraMovement : register(b0)
 {
     matrix View;
+    float4 CameraPosition;
 };
 
 /*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
@@ -46,55 +55,178 @@ C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
 cbuffer cbChangesEveryFrame : register(b2)
 {
     matrix World;
+    float4 OutputColor;
+    bool HasNormalMap;
+};
+
+/*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
+  Cbuffer:  cbLights
+
+  Summary:  Constant buffer used for shading
+C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
+
+struct PointLight
+{
+    float4 Position;
+    float4 Color;
+    matrix View;
+    matrix Projection;
+    float4 AttenuationDistance;
+};
+
+cbuffer cbLights : register(b3)
+{
+    PointLight PointLights[NUM_LIGHTS];
 };
 
 //--------------------------------------------------------------------------------------
 /*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
-  Struct:   VS_INPUT
+  Struct:   VS_PHONG_INPUT
 
   Summary:  Used as the input to the vertex shader
 C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
 
-struct VS_INPUT
+struct VS_PHONG_INPUT
 {
-    float4 Pos : POSITION;
-    float2 Tex : TEXCOORD0;
+    float4 Position : POSITION;
+    float2 TexCoord : TEXCOORD0;
+    float3 Normal : NORMAL;
+    float3 Tangent : TANGENT;
+    float3 Bitangent : BITANGENT;
+    row_major matrix mTransform : INSTANCE_TRANSFORM;
 };
 
 /*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
-  Struct:   PS_INPUT
+  Struct:   PS_PHONG_INPUT
 
-  Summary:  Used as the input to the pixel shader, output of the
+  Summary:  Used as the input to the pixel shader, output of the 
             vertex shader
 C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
 
-struct PS_INPUT
+struct PS_PHONG_INPUT
 {
-    float4 Pos : SV_POSITION;
-    float2 Tex : TEXCOORD0;
+    float4 Position : SV_POSITION;
+    float2 TexCoord : TEXCOORD0;
+    float3 Normal : NORMAL;
+    float3 WorldPosition : WORLDPOS;
+    float3 Tangent : TANGENT;
+    float3 Bitangent : BITANGENT;
+    float4 LightViewPosition : TEXCOORD1;
+};
+
+/*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
+  Struct:   PS_LIGHT_CUBE_INPUT
+
+  Summary:  Used as the input to the pixel shader, output of the 
+            vertex shader
+C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
+
+struct PS_LIGHT_CUBE_INPUT
+{
+    float4 Position : SV_POSITION;
 };
 
 //--------------------------------------------------------------------------------------
 // Vertex Shader
 //--------------------------------------------------------------------------------------
 
-PS_INPUT VS(VS_INPUT input)
+PS_PHONG_INPUT VSEnvironmentMap(VS_PHONG_INPUT input)
 {
-    PS_INPUT output = (PS_INPUT)0;
-    output.Pos = mul(input.Pos, World);
-    output.Pos = mul(output.Pos, View);
-    output.Pos = mul(output.Pos, Projection);
+    PS_PHONG_INPUT output = (PS_PHONG_INPUT) 0;
+	
+    output.Position = mul(input.Position, World);
+    output.Position = mul(output.Position, View);
+    output.Position = mul(output.Position, Projection);
+    
+    output.TexCoord = input.TexCoord;
 
-    output.Tex = input.Tex;
-
+    output.Normal = mul(float4(input.Normal, 0.0f), World).xyz;
+	
+    output.WorldPosition = mul(input.Position, World);
+	
+    if (HasNormalMap)
+    {
+        output.Tangent = normalize(mul(float4(input.Tangent, 0.0f), World).xyz);
+        output.Bitangent = normalize(mul(float4(input.Bitangent, 0.0f), World).xyz);
+    }
+    
+    output.LightViewPosition = mul(input.Position, World);
+    output.LightViewPosition = mul(output.LightViewPosition, PointLights[0].View);
+    output.LightViewPosition = mul(output.LightViewPosition, PointLights[0].Projection);
+    
     return output;
+}
+
+float LinearizeDepth(float depth)
+{
+    float z = depth * 2.0 - 1.0;
+    return ((2.0 * NEAR_PLANE * FAR_PLANE) / (FAR_PLANE + NEAR_PLANE - z * (FAR_PLANE - NEAR_PLANE))) / FAR_PLANE;
 }
 
 //--------------------------------------------------------------------------------------
 // Pixel Shader
 //--------------------------------------------------------------------------------------
+float4 PSEnvironmentMap(PS_PHONG_INPUT input) : SV_Target
+{    
+    float4 color = aTextures[0].Sample(aSamplers[0], input.TexCoord);
+    
+    float3 ambient = float3(0.2f, 0.2f, 0.2f);        
+    float3 diffuse = float3(0.0f, 0.0f, 0.0f);
+    float3 specular = float3(0.0f, 0.0f, 0.0f);
 
-float4 PS(PS_INPUT input) : SV_Target
-{
-    return txDiffuse.Sample(samLinear, input.Tex);
+    float3 viewDirection = normalize(CameraPosition.xyz - input.WorldPosition.xyz);
+    
+    float3 normal = normalize(input.Normal);
+    
+    float2 depthTexCoord;
+    
+    float3 reflectionVector = reflect(-viewDirection, input.Normal);
+    float4 environment = environmentMapTexture.Sample(environmentMapSampler, reflectionVector);
+    
+    if (HasNormalMap)
+    {
+        // Sample the pixel in the normal map.
+        float4 bumpMap = aTextures[1].Sample(aSamplers[1], input.TexCoord);
+        
+        // Expand the range of the normal value from (0, +1) to (-1, +1).  
+        bumpMap = (bumpMap * 2.0f) - 1.0f;
+        
+        // Calculate the normal from the data in the normal map.   
+        float3 bumpNormal = (bumpMap.x * input.Tangent) + (bumpMap.y * input.Bitangent) + (bumpMap.z * normal);
+        
+        // Normalize the resulting bump normal and replace existing normal   
+        normal = normalize(bumpNormal);
+    }
+        
+    depthTexCoord.x = input.LightViewPosition.x / input.LightViewPosition.w / 2.0f + 0.5f;
+    depthTexCoord.y = -input.LightViewPosition.y / input.LightViewPosition.w / 2.0f + 0.5f;
+    
+    float closestDepth = shadowMapTexture.Sample(shadowMapSampler, depthTexCoord).r;
+    float currentDepth = input.LightViewPosition.z / input.LightViewPosition.w;
+    
+    closestDepth = LinearizeDepth(closestDepth);
+    currentDepth = LinearizeDepth(currentDepth);
+    
+    if (currentDepth > closestDepth + 0.001f)
+    {
+        return float4(ambient * color.rgb, 1.0f);
+    }
+    
+    for (uint i = 0u; i < NUM_LIGHTS; ++i)
+    {
+        float3 lightDirection = normalize(input.WorldPosition - PointLights[i].Position.xyz);
+        float3 reflectDirection = reflect(lightDirection, input.Normal);
+        
+        float e = 0.000001f;
+        float distanceSquared = dot(input.WorldPosition - PointLights[i].Position.xyz, input.WorldPosition - PointLights[i].Position.xyz);
+        float attenuation = PointLights[i].AttenuationDistance.z / (distanceSquared + e);
+        
+        // calculate diffuse 
+        diffuse += saturate(dot(normal, -lightDirection)) * PointLights[i].Color.xyz * attenuation;
+        
+        // calculate specular 
+        specular += pow(saturate(dot(reflectDirection, viewDirection)), 20.0f) * PointLights[i].Color.xyz * attenuation;
+    }
+
+    return (float4(ambient + diffuse + specular, 1.0f) + environment) * aTextures[0].Sample(aSamplers[0], input.TexCoord);
 }

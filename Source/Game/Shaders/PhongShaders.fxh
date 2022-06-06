@@ -64,12 +64,18 @@ cbuffer cbChangesEveryFrame : register(b2)
   Summary:  Constant buffer used for shading
 C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
 
+struct PointLight
+{
+    float4 Position;
+    float4 Color;
+    matrix View;
+    matrix Projection;
+    float4 AttenuationDistance;
+};
+
 cbuffer cbLights : register(b3)
 {
-    float4 LightPositions[NUM_LIGHTS];
-    float4 LightColors[NUM_LIGHTS];
-    matrix LightViews[NUM_LIGHTS];
-    matrix LightProjections[NUM_LIGHTS];
+    PointLight PointLights[NUM_LIGHTS];
 };
 
 //--------------------------------------------------------------------------------------
@@ -125,7 +131,7 @@ struct PS_LIGHT_CUBE_INPUT
 
 PS_PHONG_INPUT VSPhong(VS_PHONG_INPUT input)
 {    
-    PS_PHONG_INPUT output = (PS_PHONG_INPUT)0;
+    PS_PHONG_INPUT output = (PS_PHONG_INPUT) 0;
 
     output.Position = mul(input.Position, World);
     output.Position = mul(output.Position, View);
@@ -144,8 +150,8 @@ PS_PHONG_INPUT VSPhong(VS_PHONG_INPUT input)
     }
     
     output.LightViewPosition = mul(input.Position, World);
-    output.LightViewPosition = mul(output.LightViewPosition, LightViews[0]);
-    output.LightViewPosition = mul(output.LightViewPosition, LightProjections[0]);
+    output.LightViewPosition = mul(output.LightViewPosition, PointLights[0].View);
+    output.LightViewPosition = mul(output.LightViewPosition, PointLights[0].Projection);
     
     return output;
 }
@@ -175,7 +181,7 @@ float4 PSPhong(PS_PHONG_INPUT input) : SV_TARGET
 {
     float4 color = aTextures[0].Sample(aSamplers[0], input.TexCoord);
     
-    float3 ambient = float3(0.1f, 0.1f, 0.1f);
+    float3 ambient = float3(0.2f, 0.2f, 0.2f);
         
     float3 diffuse = float3(0.0f, 0.0f, 0.0f);
 
@@ -218,14 +224,18 @@ float4 PSPhong(PS_PHONG_INPUT input) : SV_TARGET
     
     for (uint i = 0u; i < NUM_LIGHTS; ++i)
     {
-        float3 lightDirection = normalize(input.WorldPosition - LightPositions[i].xyz);
+        float3 lightDirection = normalize(input.WorldPosition - PointLights[i].Position.xyz);
         float3 reflectDirection = reflect(lightDirection, input.Normal);
         
+        float e = 0.000001f;
+        float distanceSquared = dot(input.WorldPosition - PointLights[i].Position.xyz, input.WorldPosition - PointLights[i].Position.xyz);
+        float attenuation = PointLights[i].AttenuationDistance.z / (distanceSquared + e);
+        
         // calculate diffuse 
-        diffuse += saturate(dot(normal, -lightDirection)) * LightColors[i].xyz;
+        diffuse += saturate(dot(normal, -lightDirection)) * PointLights[i].Color.xyz * attenuation;
         
         // calculate specular 
-        specular += pow(saturate(dot(reflectDirection, viewDirection)), 20.0f) * LightColors[i].xyz;
+        specular += pow(saturate(dot(reflectDirection, viewDirection)), 20.0f) * PointLights[i].Color.xyz * attenuation;
     }
 
     return float4(ambient + diffuse + specular, 1.0f) * aTextures[0].Sample(aSamplers[0], input.TexCoord);

@@ -8,6 +8,7 @@
 
   ?2022 Kyung Hee University
 ===================================================================+*/
+
 #pragma once
 
 #include "Common.h"
@@ -16,11 +17,29 @@
 
 namespace library
 {
+    /*C+C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C+++C
+      Class:    PointLight
+
+      Summary:  Point light that emits a light from a single point to
+                every direction
+
+      Methods:  GetPosition
+                  Returns the position of the light
+                GetColor
+                  Returns the color of the light
+                Update
+                  Updates the light
+                PointLight
+                  Constructor.
+                ~PointLight
+                  Destructor.
+    C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C---C-C*/
+
     class PointLight
     {
     public:
         PointLight() = delete;
-        PointLight(_In_ const XMFLOAT4& position, _In_ const XMFLOAT4& color);
+        PointLight(_In_ const XMFLOAT4& position, _In_ const XMFLOAT4& color, _In_ FLOAT attenuationDistance);
         PointLight(const PointLight& other) = default;
         PointLight(PointLight&& other) = default;
         PointLight& operator=(const PointLight& other) = default;
@@ -31,9 +50,11 @@ namespace library
         const XMFLOAT4& GetColor() const;
         const XMMATRIX& GetViewMatrix() const;
         const XMMATRIX& GetProjectionMatrix() const;
+        FLOAT GetAttenuationDistance() const;
 
         virtual void Initialize(_In_ UINT uWidth, _In_ UINT uHeight);
         virtual void Update(_In_ FLOAT deltaTime);
+
     protected:
         XMFLOAT4 m_position;
         XMFLOAT4 m_color;
@@ -42,6 +63,7 @@ namespace library
         XMVECTOR m_up;
         XMMATRIX m_view;
         XMMATRIX m_projection;
+        FLOAT m_attenuationDistance;
 
         static constexpr const XMVECTORF32 DEFAULT_UP = { 0.0f, 1.0f, 0.0f, 0.0f };
     };
